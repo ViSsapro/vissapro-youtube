@@ -9,10 +9,11 @@
     
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -27,7 +28,7 @@
             overflow-x: hidden;
         }
 
-        /* Animated Glow Border Effect */
+        /* ------------------ ANIMATED BORDER (GLOW FRAME) EFFECT ------------------ */
         @keyframes borderGlow {
             0% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
             33% { border-color: #38ef7d; box-shadow: 0 0 8px rgba(56, 239, 125, 0.4); }
@@ -41,20 +42,190 @@
             transition: transform 0.2s ease;
         }
 
-        /* Method Cards Locked / Unlocked States */
-        .method-card.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .method-card.unlocked {
-            opacity: 1;
-            cursor: pointer;
-            border-color: #22c55e !important;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        .animated-box-frame:hover {
+            transform: translateY(-4px);
         }
 
-        /* Right Slide-out Menu Drawer */
+        /* ------------------ LOGIN SCREEN STYLES ------------------ */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: #181818;
+            border-radius: 16px;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        .login-profile-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 4px solid #ff0000;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+        }
+
+        .login-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+
+        .login-card h2 span {
+            color: #ff0000;
+        }
+
+        .login-card p.desc {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .auth-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .auth-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 25px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-google { background-color: #ffffff; color: #222222; }
+        .btn-facebook { background-color: #1877f2; color: #ffffff; }
+        .btn-email { background-color: #ff0000; color: #ffffff; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #222;
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .modal-content h3 { margin-bottom: 10px; color: #fff; }
+        .modal-content p { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #111;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-submit { background-color: #ff0000; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-cancel { background-color: #444; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+
+        /* ------------------ MAIN APP SCREEN STYLES ------------------ */
+        .app-wrapper {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .top-navbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #181818;
+            padding: 12px 20px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .user-badge i { color: #ff0000; }
+
+        .badge-role {
+            background: #333;
+            color: #aaa;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
+
+        .badge-role.admin { background: #ff0000; color: #fff; }
+
+        .nav-right-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-hamburger-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .menu-hamburger-btn:hover { color: #ff0000; }
+
+        /* RIGHT SLIDE-OUT MENU (DRAWER) */
         .side-menu-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -79,34 +250,454 @@
 
         .side-menu-drawer.open { right: 0; }
 
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #252525;
+            margin-bottom: 20px;
+        }
+
+        .drawer-header h3 { font-size: 1.2rem; color: #fff; }
+
+        .close-drawer-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .close-drawer-btn:hover { color: #fff; }
+
+        .drawer-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drawer-nav-item button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #ccc;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-nav-item button i { width: 20px; color: #ff0000; }
+
+        .drawer-nav-item button:hover, .drawer-nav-item button.active {
+            background-color: #222;
+            color: #fff;
+        }
+
+        .drawer-nav-item button.highlight-green {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: #000;
+        }
+
+        /* ------------------ VIEWS CONTAINER ------------------ */
         .page-view { display: none; width: 100%; }
-        .page-view.active-view { display: flex; flex-direction: column; align-items: center; }
+        .page-view.active-view { display: block; }
+
+        /* Video / Home Tab Styles */
+        header { text-align: center; margin-bottom: 25px; }
+
+        .profile-img {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 3px solid #ff0000;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .main-tabs-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #222;
+            padding-bottom: 15px;
+        }
+
+        .main-tab-btn {
+            background-color: #1e1e1e;
+            color: #aaa;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 1px solid #333;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-tab-btn.active, .main-tab-btn:hover {
+            background-color: #ff0000;
+            color: #fff;
+            border-color: #ff0000;
+        }
+
+        .sub-tabs-container {
+            width: 100%;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 8px;
+            display: none;
+        }
+
+        .sub-tab-btn {
+            display: inline-block;
+            background-color: #222;
+            color: #ccc;
+            padding: 8px 16px;
+            margin-right: 8px;
+            border-radius: 18px;
+            border: 1px solid #333;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .sub-tab-btn.active { background-color: #ffffff; color: #000; }
+
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .playlist-card {
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .playlist-card i { font-size: 40px; color: #ff0000; margin-bottom: 12px; }
+
+        .video-container {
+            background-color: #1f1f1f;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border: 0;
+        }
+
+        .video-details { padding: 20px; }
+        .video-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
+        .video-description {
+            color: #ccc; font-size: 0.95rem; line-height: 1.6;
+            background-color: #2a2a2a; padding: 12px;
+            border-radius: 8px; border-left: 4px solid #ff0000;
+            margin-bottom: 15px; white-space: pre-wrap;
+            max-height: 140px; overflow-y: auto;
+        }
+
+        .yt-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background-color: #ff0000; color: #ffffff;
+            padding: 8px 18px; text-decoration: none;
+            font-weight: bold; border-radius: 20px; font-size: 0.9rem;
+        }
+
+        /* ------------------ MAKE MONEY (EARN ADS) PAGE STYLES ------------------ */
+        .earn-container {
+            background-color: #181818;
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+        }
+
+        .earn-banner {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border-radius: 12px;
+            padding: 25px;
+            color: #000;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .earn-banner h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .earn-banner p { font-size: 1rem; font-weight: 600; opacity: 0.9; }
+
+        .ad-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .ad-card {
+            background-color: #222;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .ad-badge {
+            align-self: flex-start;
+            background: rgba(56, 239, 125, 0.2);
+            color: #38ef7d;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ad-title { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+        .ad-desc { color: #aaa; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.4; }
+
+        .btn-watch-ad {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(45deg, #ff0000, #ff5252);
+            color: #ffffff;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .btn-watch-ad:hover { transform: scale(1.02); filter: brightness(1.1); }
+
+        /* ------------------ PAYMENT & WITHDRAW STYLES ------------------ */
+        .withdraw-card {
+            background: #222;
+            padding: 25px;
+            border-radius: 14px;
+            margin-top: 15px;
+        }
+
+        .withdraw-card input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #111;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .balance-badge-box {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: #000;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Target Timeline / Progress Bar for Selected Method */
+        .timeline-box {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 14px;
+            background-color: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0000, #38ef7d);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Method Selection Tabs (Binance, Bank, Paypal) */
+        .method-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .method-btn {
+            background-color: #111;
+            color: #ccc;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .method-btn i { font-size: 1.3rem; }
+        .method-btn.active {
+            border-color: #38ef7d !important;
+            background-color: #2a2a2a;
+            color: #38ef7d;
+        }
+
+        .method-form { display: none; }
+        .method-form.active { display: block; }
+
+        /* Floating (+) Admin Button */
+        .fab-container {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            display: none;
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            gap: 12px;
+            z-index: 2000;
+        }
+
+        .fab-main {
+            width: 60px; height: 60px;
+            background-color: #ff0000; color: white;
+            border-radius: 50%; display: flex;
+            justify-content: center; align-items: center;
+            font-size: 26px; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
+            cursor: pointer; border: none; transition: transform 0.3s ease;
+        }
+
+        .fab-container.active .fab-main { transform: rotate(45deg); background-color: #444; }
+        .fab-options { display: none; flex-direction: column; gap: 10px; align-items: flex-end; }
+        .fab-container.active .fab-options { display: flex; }
+
+        .fab-option-btn {
+            display: flex; align-items: center; gap: 10px;
+            background-color: #222; color: white;
+            padding: 10px 16px; border-radius: 25px;
+            border: 1px solid #444; cursor: pointer;
+            font-weight: 600; white-space: nowrap;
+        }
+        .fab-option-btn i { color: #ff0000; }
     </style>
 </head>
-<body class="p-4">
+<body>
 
     <!-- ================================================================= -->
-    <!-- MAIN APP WRAPPER (Top Navbar + Sidebar + Views) -->
+    <!-- SECTION 1: LOGIN / SIGN IN PAGE -->
     <!-- ================================================================= -->
-    <div class="w-full max-w-4xl flex flex-col items-center relative" id="appScreen">
-        
-        <!-- Top Navbar with Home / Menu Burger -->
-        <div class="w-full bg-[#181818] border border-red-500/30 rounded-full px-6 py-3 flex justify-between items-center mb-8 shadow-lg animated-box-frame">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-red-600/20 border border-red-500 flex items-center justify-center text-red-500 font-bold">
-                    <i class="fa-solid fa-user-circle"></i>
+    <div class="login-wrapper" id="loginScreen">
+        <div class="login-card animated-box-frame">
+            <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="login-profile-img">
+            <h2><span>VissaPro</span> Hub</h2>
+            <p class="desc">වීඩියෝ නැරඹීමට හෝ E-Money Portal එකට පිවිසීමට Log in වන්න.</p>
+
+            <div class="auth-btn-group">
+                <button class="auth-btn btn-google" onclick="triggerGoogleLogin()">
+                    <i class="fa-brands fa-google" style="color: #ea4335;"></i> Sign in with Google
+                </button>
+                <button class="auth-btn btn-facebook" onclick="triggerFacebookLogin()">
+                    <i class="fa-brands fa-facebook-f"></i> Sign in with Facebook
+                </button>
+                <button class="auth-btn btn-email" onclick="openEmailModal()">
+                    <i class="fa-solid fa-envelope"></i> Email Verification Sign In
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Email Request & OTP Verification -->
+    <div class="modal" id="emailAuthModal">
+        <div class="modal-content animated-box-frame">
+            <h3 id="emailModalTitle">Email Sign In</h3>
+            <p id="emailModalDesc">ඔබගේ Email එක ඇතුළත් කර Verification Code (OTP) එක ලබාගන්න.</p>
+
+            <div id="otpStep1">
+                <input type="email" id="userEmailInput" placeholder="example@gmail.com">
+                <div class="modal-buttons">
+                    <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
+                    <button class="btn-submit" onclick="sendOTPCode()">Get Verification Code</button>
                 </div>
-                <span id="displayUserEmail" class="text-sm md:text-base font-medium text-gray-200">vimukhithuhina754@gmail.com</span>
-                <span id="displayUserRole" class="bg-red-600 text-white text-xs px-2.5 py-1 rounded-full font-semibold">Admin (Creator)</span>
             </div>
 
-            <div class="flex items-center gap-4">
-                <!-- Home Quick Button -->
-                <button onclick="switchPageView('home')" class="bg-gray-800 hover:bg-gray-700 text-gray-200 px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors">
-                    <i class="fa-solid fa-house text-red-500"></i> Home
-                </button>
-                <!-- Hamburger Sidebar Button -->
-                <button onclick="toggleSideMenu()" class="text-white text-xl hover:text-red-500 transition-colors">
+            <div id="otpStep2" style="display: none;">
+                <input type="text" id="otpInput" placeholder="Enter 6-digit Code (e.g. 123456)">
+                <div class="modal-buttons">
+                    <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
+                    <button class="btn-submit" onclick="verifyOTPCode()">Verify & Sign In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 2: MAIN APP DASHBOARD WITH SIDE MENU -->
+    <!-- ================================================================= -->
+    <div class="app-wrapper" id="appScreen">
+        
+        <!-- Top Navbar -->
+        <div class="top-navbar animated-box-frame" style="border-radius: 30px;">
+            <div class="user-badge">
+                <i class="fa-solid fa-user-circle"></i>
+                <span id="displayUserEmail">user@gmail.com</span>
+                <span id="displayUserRole" class="badge-role">Viewer</span>
+            </div>
+
+            <div class="nav-right-actions">
+                <button class="menu-hamburger-btn" onclick="toggleSideMenu()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
@@ -115,198 +706,346 @@
         <!-- RIGHT SIDE NAVIGATION DRAWER MENU -->
         <div class="side-menu-overlay" id="menuOverlay" onclick="toggleSideMenu()"></div>
         <div class="side-menu-drawer" id="sideDrawer">
-            <div class="flex justify-between items-center pb-4 border-b border-gray-800 mb-5">
-                <h3 class="text-lg font-bold text-white">VissaPro Menu</h3>
-                <button onclick="toggleSideMenu()" class="text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <div class="drawer-header">
+                <h3>VissaPro Menu</h3>
+                <button class="close-drawer-btn" onclick="toggleSideMenu()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <ul class="flex flex-col gap-2">
-                <li>
-                    <button id="navHome" onclick="switchPageView('home')" class="w-full bg-[#222] text-white px-4 py-3 rounded-xl font-semibold flex items-center gap-3 hover:bg-red-600 transition-colors text-left">
-                        <i class="fa-solid fa-house text-red-500"></i> Home (Videos)
+            <ul class="drawer-nav-list">
+                <li class="drawer-nav-item">
+                    <button id="navHome" class="active" onclick="switchPageView('home')">
+                        <i class="fa-solid fa-house"></i> Home (Videos)
                     </button>
                 </li>
-                <li>
-                    <button id="navMakeMoney" onclick="switchPageView('makemoney')" class="w-full bg-[#222] text-white px-4 py-3 rounded-xl font-semibold flex items-center gap-3 hover:bg-red-600 transition-colors text-left">
-                        <i class="fa-solid fa-sack-dollar text-green-400"></i> Make Money
+                <li class="drawer-nav-item">
+                    <button id="navMakeMoney" class="highlight-green" onclick="switchPageView('makemoney')">
+                        <i class="fa-solid fa-sack-dollar" style="color:#000;"></i> Make Money
                     </button>
                 </li>
-                <li>
-                    <button id="navPaymentDetails" onclick="switchPageView('paymentDetails')" class="w-full bg-[#222] text-white px-4 py-3 rounded-xl font-semibold flex items-center gap-3 hover:bg-red-600 transition-colors text-left">
-                        <i class="fa-solid fa-wallet text-amber-400"></i> Payment Details / Withdraw
+                <li class="drawer-nav-item">
+                    <button id="navPaymentDetails" onclick="switchPageView('paymentDetails')">
+                        <i class="fa-solid fa-wallet"></i> Payment Details / Withdraw
                     </button>
                 </li>
-                <li>
-                    <button id="navComments" onclick="switchPageView('comments')" class="w-full bg-[#222] text-white px-4 py-3 rounded-xl font-semibold flex items-center gap-3 hover:bg-red-600 transition-colors text-left">
-                        <i class="fa-solid fa-comments text-blue-400"></i> Your Comments
+                <li class="drawer-nav-item">
+                    <button id="navComments" onclick="switchPageView('comments')">
+                        <i class="fa-solid fa-comments"></i> Your Comments
                     </button>
                 </li>
-                <li>
-                    <button id="navAccount" onclick="switchPageView('account')" class="w-full bg-[#222] text-white px-4 py-3 rounded-xl font-semibold flex items-center gap-3 hover:bg-red-600 transition-colors text-left">
-                        <i class="fa-solid fa-user-gear text-purple-400"></i> Your Account
+                <li class="drawer-nav-item">
+                    <button id="navAccount" onclick="switchPageView('account')">
+                        <i class="fa-solid fa-user-gear"></i> Your Account
                     </button>
                 </li>
-                <li class="mt-6">
-                    <button onclick="alert('Logged out')" class="w-full bg-red-600/20 text-red-400 px-4 py-3 rounded-xl font-semibold flex items-center gap-3 hover:bg-red-600 hover:text-white transition-colors text-left">
-                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                <li class="drawer-nav-item" style="margin-top: 20px;">
+                    <button onclick="logout()" style="color: #ff5252;">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #ff5252;"></i> Logout
                     </button>
                 </li>
             </ul>
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 1: HOME PAGE (VIDEOS) -->
+        <!-- VIEW 1: HOME PAGE (VIDEOS & PLAYLISTS) -->
         <!-- ============================================================= -->
-        <div id="viewHome" class="page-view active-view w-full">
-            <div class="text-center py-8">
-                <h1 class="text-3xl font-bold mb-2">Welcome to <span class="text-red-500">VissaPro</span> Hub</h1>
-                <p class="text-gray-400">ඔබට අවශ්‍ය සියලුම වීඩියෝ සහ පාඩම් මෙතැනින් නරඹන්න.</p>
+        <div id="viewHome" class="page-view active-view">
+            <header>
+                <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="profile-img">
+                <h1>Welcome to <span>VissaPro</span> Hub</h1>
+                <p style="color:#aaa;">ඔබට අවශ්‍ය E-Money වීඩියෝ සහ Playlists මෙතැනින් බලන්න!</p>
+            </header>
+
+            <div class="main-tabs-container">
+                <button class="main-tab-btn active animated-box-frame" style="border-radius: 25px;" id="tabAllVideosBtn" onclick="switchMainView('videos')">
+                    <i class="fa-solid fa-play"></i> All Videos
+                </button>
+                <button class="main-tab-btn animated-box-frame" style="border-radius: 25px;" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
+                    <i class="fa-solid fa-folder-open"></i> All Playlists
+                </button>
             </div>
-            <!-- Video content placeholder -->
-            <div class="w-full bg-[#181818] p-6 rounded-2xl animated-box-frame text-center">
-                <p class="text-gray-300">ප්‍රධාන වීඩියෝ ලැයිස්තුව මෙහි පෙන්වනු ලැබේ.</p>
-            </div>
+
+            <div class="sub-tabs-container" id="playlistSubTabs"></div>
+            <div class="content-container" id="mainContent"></div>
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 2: MAKE MONEY PAGE -->
+        <!-- VIEW 2: MAKE MONEY PAGE (ADS WITH SHORTLINK & $0.00010 EARNINGS) -->
         <!-- ============================================================= -->
-        <div id="viewMakeMoney" class="page-view w-full">
-            <div class="w-full bg-[#181818] p-6 rounded-2xl animated-box-frame text-center">
-                <h2 class="text-2xl font-bold mb-3 text-green-400">Watch Ads & Earn</h2>
-                <p class="text-gray-300">ඇඩ් නරඹමින් මුදල් උපයන්න.</p>
+        <div id="viewMakeMoney" class="page-view">
+            <div class="earn-container animated-box-frame">
+                <div class="earn-banner">
+                    <h2><i class="fa-solid fa-coins"></i> Watch Ads & Earn Money</h2>
+                    <p>පහත Ad Buttons ක්ලික් කර නැරඹීමෙන් ඔබගේ Balance එකට $0.00010 බැගින් එකතු කරගන්න!</p>
+                </div>
+
+                <div class="ad-cards-grid">
+                    <!-- Ad Item 1 -->
+                    <div class="ad-card animated-box-frame">
+                        <div>
+                            <span class="ad-badge">Reward: $0.00010</span>
+                            <div class="ad-title">Adsterra Premium Task 1</div>
+                            <div class="ad-desc">ඇඩ් එක නරඹා $0.00010 ක් ඔබගේ ගිණුමට එකතු කරගන්න.</div>
+                        </div>
+                        <button class="btn-watch-ad" onclick="watchAdAction('Adsterra Task 1')">
+                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
+                        </button>
+                    </div>
+
+                    <!-- Ad Item 2 -->
+                    <div class="ad-card animated-box-frame">
+                        <div>
+                            <span class="ad-badge">Reward: $0.00010</span>
+                            <div class="ad-title">Adsterra Premium Task 2</div>
+                            <div class="ad-desc">විශේෂ ඇඩ් එක නරඹා සාර්ථකව Reward එක Unlock කරන්න.</div>
+                        </div>
+                        <button class="btn-watch-ad" onclick="watchAdAction('Adsterra Task 2')">
+                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
+                        </button>
+                    </div>
+
+                    <!-- Ad Item 3 -->
+                    <div class="ad-card animated-box-frame">
+                        <div>
+                            <span class="ad-badge">Reward: $0.00010</span>
+                            <div class="ad-title">Adsterra Premium Task 3</div>
+                            <div class="ad-desc">මෙම ඇඩ් එක ක්ලික් කර $0.00010 ක ගෙවීම් මුදල සක්‍රිය කරගන්න.</div>
+                        </div>
+                        <button class="btn-watch-ad" onclick="watchAdAction('Adsterra Task 3')">
+                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- ============================================================= -->
         <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL -->
         <!-- ============================================================= -->
-        <div id="viewPaymentDetails" class="page-view w-full">
-            <div class="w-full bg-[#141414] border border-amber-500/40 rounded-2xl p-6 md:p-8 animated-box-frame">
-                
-                <!-- Icon & Title -->
-                <div class="flex flex-col items-center text-center mb-6">
-                    <div class="text-red-500 mb-2">
-                        <i class="fa-solid fa-wallet text-4xl"></i>
-                    </div>
-                    <h1 class="text-2xl md:text-3xl font-bold tracking-wide">Payment Details & Withdraw Portal</h1>
-                    <p class="text-gray-400 text-sm mt-1">තෝරාගත් Method එකේ Target Limit එක සම්පූර්ණ වූ පසු Withdraw Request එක යොමු කරන්න.</p>
+        <div id="viewPaymentDetails" class="page-view">
+            <div class="earn-container animated-box-frame">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <i class="fa-solid fa-wallet" style="font-size: 50px; color: #ff0000; margin-bottom: 10px;"></i>
+                    <h2>Payment Details & Withdraw Portal</h2>
+                    <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">තෝරාගත් Method එකේ Target Limit එක සම්පූර්ණ වූ පසු Withdraw Request එක යොමු කරන්න.</p>
                 </div>
 
-                <!-- Total Balance Banner -->
-                <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-xl p-6 text-center mb-8 shadow-xl">
-                    <h3 class="text-white/90 text-sm md:text-base font-semibold uppercase tracking-wider">Total Balance:</h3>
-                    <div id="total-balance" class="text-3xl md:text-5xl font-extrabold text-white mt-2">$0.00010</div>
-                </div>
-
-                <!-- Select Payment Method (3 Separate Boxes with individual timelines) -->
-                <h2 class="text-xl font-bold text-center mb-6 text-gray-200">Select Payment Method</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Total Balance Box -->
+                <div class="balance-badge-box">
+                    <span style="font-size: 0.9rem;">Total Balance:</span>
+                    <h1 id="withdrawDisplayBalance" style="font-size: 2.3rem; margin-top: 5px;">$0.00000</h1>
                     
-                    <!-- PayPal Box -->
-                    <div id="card-paypal" onclick="selectMethod('paypal')" class="method-card locked bg-[#1e1e1e] border-2 border-gray-700 rounded-xl p-5 flex flex-col items-center transition-all duration-300 animated-box-frame">
-                        <div class="text-blue-400 font-bold text-lg mb-1 flex items-center gap-2">
-                            <i class="fa-brands fa-paypal"></i> <span>PayPal</span>
+                    <!-- Dynamic Target Timeline according to selected Payment Method -->
+                    <div class="timeline-box">
+                        <div class="timeline-header">
+                            <span id="timelineTitleText">PayPal Goal Progress ($3.00 Target)</span>
+                            <span id="timelinePercent">0.00%</span>
                         </div>
-                        <div class="text-xs text-gray-400 mb-4">Target Limit: $3.00</div>
-                        
-                        <!-- PayPal Timeline -->
-                        <div class="w-full bg-gray-800 rounded-full h-3 mb-2 overflow-hidden border border-gray-700">
-                            <div id="paypal-bar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="timelineBarFill"></div>
                         </div>
-                        <div class="flex justify-between w-full text-[11px] text-gray-400">
-                            <span id="paypal-current">$0.00</span>
-                            <span id="paypal-remaining">Remaining: $3.00</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; margin-top: 6px;">
+                            <span>$0.00</span>
+                            <span id="remainingText">Remaining: $3.00</span>
+                            <span id="timelineMaxText">$3.00</span>
                         </div>
-                        <div id="paypal-status" class="mt-3 text-xs font-semibold text-red-400">Locked 🔒</div>
                     </div>
-
-                    <!-- Binance Box -->
-                    <div id="card-binance" onclick="selectMethod('binance')" class="method-card locked bg-[#1e1e1e] border-2 border-gray-700 rounded-xl p-5 flex flex-col items-center transition-all duration-300 animated-box-frame">
-                        <div class="text-amber-400 font-bold text-lg mb-1 flex items-center gap-2">
-                            <i class="fa-solid fa-cubes"></i> <span>Binance</span>
-                        </div>
-                        <div class="text-xs text-gray-400 mb-4">Target Limit: $5.50</div>
-                        
-                        <!-- Binance Timeline -->
-                        <div class="w-full bg-gray-800 rounded-full h-3 mb-2 overflow-hidden border border-gray-700">
-                            <div id="binance-bar" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
-                        </div>
-                        <div class="flex justify-between w-full text-[11px] text-gray-400">
-                            <span id="binance-current">$0.00</span>
-                            <span id="binance-remaining">Remaining: $5.50</span>
-                        </div>
-                        <div id="binance-status" class="mt-3 text-xs font-semibold text-red-400">Locked 🔒</div>
-                    </div>
-
-                    <!-- Bank Box -->
-                    <div id="card-bank" onclick="selectMethod('bank')" class="method-card locked bg-[#1e1e1e] border-2 border-gray-700 rounded-xl p-5 flex flex-col items-center transition-all duration-300 animated-box-frame">
-                        <div class="text-red-400 font-bold text-lg mb-1 flex items-center gap-2">
-                            <i class="fa-solid fa-building-columns"></i> <span>Bank Account</span>
-                        </div>
-                        <div class="text-xs text-gray-400 mb-4">Target Limit: $10.00</div>
-                        
-                        <!-- Bank Timeline -->
-                        <div class="w-full bg-gray-800 rounded-full h-3 mb-2 overflow-hidden border border-gray-700">
-                            <div id="bank-bar" class="bg-red-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
-                        </div>
-                        <div class="flex justify-between w-full text-[11px] text-gray-400">
-                            <span id="bank-current">$0.00</span>
-                            <span id="bank-remaining">Remaining: $10.00</span>
-                        </div>
-                        <div id="bank-status" class="mt-3 text-xs font-semibold text-red-400">Locked 🔒</div>
-                    </div>
-
                 </div>
 
-                <!-- Hidden Details Form Section (Appears after clicking unlocked box) -->
-                <div id="details-section" class="hidden bg-[#1a1a1a] border border-emerald-500/40 rounded-xl p-6 mt-6 transition-all duration-500">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 id="form-title" class="text-lg font-bold text-emerald-400">Submit Details</h3>
-                        <button onclick="closeDetails()" class="text-gray-400 hover:text-white text-sm bg-gray-800 px-3 py-1 rounded">Close ✕</button>
-                    </div>
-
-                    <form id="withdraw-form" onsubmit="submitWithdraw(event)" class="space-y-4">
-                        <div id="dynamic-input-container"></div>
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg transition-colors shadow-lg">
-                            Confirm & Submit Withdraw Request
+                <!-- Withdraw Form with 3 Method Boxes -->
+                <div class="withdraw-card animated-box-frame">
+                    <h3 style="margin-bottom: 15px; text-align: center;">Select Payment Method</h3>
+                    
+                    <!-- Method Selector Tabs (PayPal, Binance, Bank with Animated Frames) -->
+                    <div class="method-tabs">
+                        <button class="method-btn active animated-box-frame" id="btnMethodPaypal" onclick="selectPaymentMethod('paypal')">
+                            <i class="fa-brands fa-paypal" style="color:#003087;"></i> PayPal
+                            <span style="font-size:0.7rem; color:#888;">Limit: $3.00</span>
                         </button>
-                    </form>
+                        <button class="method-btn animated-box-frame" id="btnMethodBinance" onclick="selectPaymentMethod('binance')">
+                            <i class="fa-solid fa-cubes" style="color:#f3ba2f;"></i> Binance
+                            <span style="font-size:0.7rem; color:#888;">Limit: $4.50</span>
+                        </button>
+                        <button class="method-btn animated-box-frame" id="btnMethodBank" onclick="selectPaymentMethod('bank')">
+                            <i class="fa-solid fa-building-columns" style="color:#ff0000;"></i> Bank
+                            <span style="font-size:0.7rem; color:#888;">Limit: $6.50</span>
+                        </button>
+                    </div>
+
+                    <!-- PayPal Form -->
+                    <div id="formPaypal" class="method-form active">
+                        <label style="color: #aaa; font-size: 0.85rem;">PayPal Email Address:</label>
+                        <input type="email" id="wPaypalEmail" placeholder="e.g. yourname@paypal.com">
+                    </div>
+
+                    <!-- Binance Form -->
+                    <div id="formBinance" class="method-form">
+                        <label style="color: #aaa; font-size: 0.85rem;">Binance Pay ID or USDT (BEP20) Address:</label>
+                        <input type="text" id="wBinanceId" placeholder="e.g. 254896321 / 0x123...">
+                    </div>
+
+                    <!-- Bank Form -->
+                    <div id="formBank" class="method-form">
+                        <label style="color: #aaa; font-size: 0.85rem;">Bank Name:</label>
+                        <input type="text" id="wBankName" placeholder="e.g. Commercial Bank">
+
+                        <label style="color: #aaa; font-size: 0.85rem;">Account Number:</label>
+                        <input type="text" id="wAccNumber" placeholder="e.g. 8010459201">
+
+                        <label style="color: #aaa; font-size: 0.85rem;">Branch Name:</label>
+                        <input type="text" id="wBranch" placeholder="e.g. Colombo Fort">
+
+                        <label style="color: #aaa; font-size: 0.85rem;">Account Holder Name:</label>
+                        <input type="text" id="wAccName" placeholder="e.g. A.B.C. Perera">
+                    </div>
+
+                    <!-- Common Withdraw Amount Field -->
+                    <label style="color: #aaa; font-size: 0.85rem; margin-top: 5px; display: block;">Withdraw Amount ($):</label>
+                    <input type="number" step="0.00010" id="wAmount" placeholder="0.00010">
+
+                    <button class="btn-submit" style="width: 100%; padding: 14px; margin-top: 10px; font-size: 1rem;" onclick="requestWithdrawal()">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 4: YOUR COMMENTS PAGE -->
+        <!-- ============================================================= -->
+        <div id="viewComments" class="page-view">
+            <div class="earn-container animated-box-frame">
+                <h2 style="margin-bottom: 15px;"><i class="fa-solid fa-comments" style="color:#ff0000;"></i> Your Comments & Feedback</h2>
+                
+                <div class="comment-input-group">
+                    <textarea id="newCommentText" placeholder="ඔබගේ අදහස් හෝ ගැටලු මෙතැන සටහන් කරන්න..." style="width:100%; height:90px; background:#111; border:1px solid #444; border-radius:8px; color:#fff; padding:12px; font-size:0.95rem; margin-bottom:10px;"></textarea>
+                    <button class="btn-submit" onclick="postComment()">Post Comment</button>
                 </div>
 
+                <div id="commentsList" style="margin-top:20px;">
+                    <div style="background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;">
+                        <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">Vimukthi Thuhina (Admin)</div>
+                        <div style="font-size:0.95rem; color:#ddd;">සාදරයෙන් පිළිගන්නවා VissaPro E-Money චැනල් එකට! ඕනෑම ගැටලුවක් මෙතනින් අහන්න.</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 4: COMMENTS PAGE -->
+        <!-- VIEW 5: YOUR ACCOUNT PAGE -->
         <!-- ============================================================= -->
-        <div id="viewComments" class="page-view w-full">
-            <div class="w-full bg-[#181818] p-6 rounded-2xl animated-box-frame">
-                <h2 class="text-xl font-bold mb-3 text-red-500"><i class="fa-solid fa-comments"></i> Comments</h2>
-                <p class="text-gray-300">ඔබගේ අදහස් මෙහි සටහන් කරන්න.</p>
+        <div id="viewAccount" class="page-view">
+            <div class="earn-container animated-box-frame" style="text-align: center;">
+                <i class="fa-solid fa-user-astronaut" style="font-size: 60px; color: #ff0000; margin-bottom: 15px;"></i>
+                <h2>Your Account Details</h2>
+                <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: left;">
+                    <p style="margin-bottom: 10px;"><strong>Logged Email:</strong> <span id="accEmail">user@gmail.com</span></p>
+                    <p style="margin-bottom: 10px;"><strong>Account Status:</strong> <span style="color:#38ef7d;">Active</span></p>
+                    <p><strong>Total Earnings:</strong> <span id="accBalance" style="color:#38ef7d; font-weight:bold;">$0.00000</span></p>
+                </div>
             </div>
         </div>
 
-        <!-- ============================================================= -->
-        <!-- VIEW 5: ACCOUNT PAGE -->
-        <!-- ============================================================= -->
-        <div id="viewAccount" class="page-view w-full">
-            <div class="w-full bg-[#181818] p-6 rounded-2xl animated-box-frame text-center">
-                <h2 class="text-2xl font-bold mb-3 text-red-500"><i class="fa-solid fa-user-gear"></i> Account Details</h2>
-                <p class="text-gray-300">පරිශීලක තොරතුරු.</p>
+        <!-- Floating Admin (+) Button -->
+        <div class="fab-container" id="fabContainer">
+            <button class="fab-main" onclick="toggleFab()"><i class="fa-solid fa-plus"></i></button>
+            <div class="fab-options">
+                <button class="fab-option-btn animated-box-frame" onclick="openPlaylistModal()">
+                    <i class="fa-solid fa-folder-plus"></i> + Add Playlist
+                </button>
+                <button class="fab-option-btn animated-box-frame" onclick="openVideoModal()">
+                    <i class="fa-solid fa-video"></i> + Add Video
+                </button>
             </div>
         </div>
-
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Modals for Admin -->
+    <div class="modal" id="playlistModal">
+        <div class="modal-content animated-box-frame">
+            <h3>නව Playlist එකක් සාදන්න</h3>
+            <input type="text" id="playlistNameInput" placeholder="Playlist Name (e.g. Trading Course)">
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeAdminModals()">Cancel</button>
+                <button class="btn-submit" onclick="addPlaylist()">Create Playlist</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div class="modal-content animated-box-frame">
+            <h3>නව Video එකක් එකතු කරන්න</h3>
+            <select id="playlistSelect" style="width:100%; padding:12px; margin-bottom:15px; border-radius:6px; background:#111; color:#fff; border:1px solid #444;">
+                <option value="none">-- None (Single Video / Direct Upload) --</option>
+            </select>
+            <input type="text" id="ytLinkInput" placeholder="YouTube Link (e.g., https://youtu.be/xxx)">
+            <input type="text" id="customTitle" placeholder="Title (Optional)">
+            <input type="text" id="customDesc" placeholder="Description (Optional)">
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeAdminModals()">Cancel</button>
+                <button class="btn-submit" onclick="addVideo()">Add Video</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE MODULE & JAVASCRIPT LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
+            authDomain: "vissapro-aa91d.firebaseapp.com",
+            projectId: "vissapro-aa91d",
+            storageBucket: "vissapro-aa91d.firebasestorage.app",
+            messagingSenderId: "866553327331",
+            appId: "1:866553327331:web:60ef47fa0c88a942571fd6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.triggerGoogleLogin = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+                .then((res) => { window.loginSuccess(res.user.email); })
+                .catch((err) => { alert("Google Sign-In Error: " + err.message); });
+        };
+
+        window.triggerFacebookLogin = function() {
+            const provider = new FacebookAuthProvider();
+            signInWithPopup(auth, provider)
+                .then((res) => { window.loginSuccess(res.user.email || "facebook_user@vissapro.com"); })
+                .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
+        };
+    </script>
+
     <script>
-        const currentBalance = 0.00010; // Test සඳහා අගය වෙනස් කළ හැක
-        
-        const targets = {
+        // EmailJS Init
+        (function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
+
+        const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
+        const ADSTERRA_SHORTLINK = "https://www.profitableratecpmnetwork.com/vjqz55vz70?key=9d1607f0aa27ecbba8680e15d9d0ec4a";
+
+        // Payment Method Minimum Thresholds
+        const LIMITS = {
             paypal: 3.00,
-            binance: 5.50,
-            bank: 10.00
+            binance: 4.50,
+            bank: 6.50
+        };
+
+        let generatedOTP = null;
+        let pendingEmail = "";
+        let userBalance = 0.00000;
+        let selectedPaymentMethod = 'paypal';
+
+        // App Data
+        let singleVideos = JSON.parse(localStorage.getItem('vissaSingleVideos')) || [];
+        let playlistsData = JSON.parse(localStorage.getItem('vissaPlaylistsData')) || [];
+        let currentView = 'videos';
+        let selectedPlaylistId = null;
+
+        window.onload = function() {
+            const loggedUser = localStorage.getItem('vissaLoggedUser');
+            if (loggedUser) { initDashboard(loggedUser); }
         };
 
         function toggleSideMenu() {
@@ -318,7 +1057,8 @@
 
         function switchPageView(page) {
             document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
-            
+            document.querySelectorAll('.drawer-nav-item button').forEach(b => b.classList.remove('active'));
+
             const targetMap = {
                 'home': 'viewHome',
                 'makemoney': 'viewMakeMoney',
@@ -328,114 +1068,328 @@
             };
             
             document.getElementById(targetMap[page]).classList.add('active-view');
-            
-            // Close drawer if open
-            const drawer = document.getElementById('sideDrawer');
-            if (drawer.classList.contains('open')) {
-                toggleSideMenu();
-            }
+            document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
+            toggleSideMenu();
         }
 
-        function updatePortal() {
-            document.getElementById('total-balance').innerText = `$${currentBalance.toFixed(5)}`;
+        /* Update Balance and Dynamic Method Timeline Bar */
+        function updateBalanceDisplay() {
+            const formatted = '$' + userBalance.toFixed(5);
+            document.getElementById('accBalance').innerText = formatted;
+            document.getElementById('withdrawDisplayBalance').innerText = formatted;
 
-            for (let method in targets) {
-                let target = targets[method];
-                let percentage = (currentBalance / target) * 100;
-                if (percentage > 100) percentage = 100;
+            // Method Specific Limit calculation
+            const currentLimit = LIMITS[selectedPaymentMethod];
+            const methodNameCap = selectedPaymentMethod.charAt(0).toUpperCase() + selectedPaymentMethod.slice(1);
+            
+            document.getElementById('timelineTitleText').innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
+            document.getElementById('timelineMaxText').innerText = `$${currentLimit.toFixed(2)}`;
 
-                let remaining = target - currentBalance;
-                if (remaining < 0) remaining = 0;
+            const percent = Math.min((userBalance / currentLimit) * 100, 100).toFixed(2);
+            document.getElementById('timelinePercent').innerText = percent + '%';
+            document.getElementById('timelineBarFill').style.width = percent + '%';
 
-                document.getElementById(`${method}-bar`).style.width = `${percentage}%`;
-                document.getElementById(`${method}-current`).innerText = `$${currentBalance.toFixed(5)}`;
-                document.getElementById(`${method}-remaining`).innerText = `Remaining: $${remaining.toFixed(5)}`;
+            const remaining = Math.max(0, currentLimit - userBalance).toFixed(5);
+            document.getElementById('remainingText').innerText = `Remaining: $${remaining}`;
+        }
 
-                let card = document.getElementById(`card-${method}`);
-                let status = document.getElementById(`${method}-status`);
+        /* Make Money - Ad Handler */
+        function watchAdAction(adTitle) {
+            window.open(ADSTERRA_SHORTLINK, '_blank');
+            userBalance += 0.00010;
+            updateBalanceDisplay();
+            alert(`"${adTitle}" සක්‍රිය විය! $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
+        }
 
-                if (currentBalance >= target) {
-                    card.classList.remove('locked');
-                    card.classList.add('unlocked');
-                    status.innerText = 'Unlocked! Click to Withdraw ✅';
-                    status.classList.remove('text-red-400');
-                    status.classList.add('text-green-400');
+        /* Payment Method Tabs Handler */
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.method-form').forEach(f => f.classList.remove('active'));
+
+            if (method === 'paypal') {
+                document.getElementById('btnMethodPaypal').classList.add('active');
+                document.getElementById('formPaypal').classList.add('active');
+            } else if (method === 'binance') {
+                document.getElementById('btnMethodBinance').classList.add('active');
+                document.getElementById('formBinance').classList.add('active');
+            } else if (method === 'bank') {
+                document.getElementById('btnMethodBank').classList.add('active');
+                document.getElementById('formBank').classList.add('active');
+            }
+
+            updateBalanceDisplay();
+        }
+
+        /* Withdrawal Request Handler with Limit Check */
+        function requestWithdrawal() {
+            const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
+            const amount = document.getElementById('wAmount').value.trim();
+            const minLimit = LIMITS[selectedPaymentMethod];
+            let detailsText = "";
+
+            if (userBalance < minLimit) {
+                const rem = (minLimit - userBalance).toFixed(5);
+                alert(`Withdraw කිරීමට නොහැක!\n\n${selectedPaymentMethod.toUpperCase()} සඳහා අවම Withdrawal limit එක $${minLimit.toFixed(2)} කි.\nඔබට තව $${rem} ක් ලබා ගැනීමට අවශ්‍යයි.`);
+                return;
+            }
+
+            if (!amount || parseFloat(amount) <= 0) {
+                alert('කරුණාකර Withdraw කිරීමට අවශ්‍ය ඩොලර් ගණන ඇතුළත් කරන්න!');
+                return;
+            }
+
+            if (parseFloat(amount) > userBalance) {
+                alert('ඔබගේ Total Balance එකට වඩා වැඩි මුදලක් Withdraw කිරීමට නොහැක!');
+                return;
+            }
+
+            if (selectedPaymentMethod === 'paypal') {
+                const ppEmail = document.getElementById('wPaypalEmail').value.trim();
+                if (!ppEmail) { alert('කරුණාකර PayPal Email එක ඇතුළත් කරන්න!'); return; }
+                detailsText = `Method: PayPal\nPayPal Email: ${ppEmail}`;
+            } else if (selectedPaymentMethod === 'binance') {
+                const bId = document.getElementById('wBinanceId').value.trim();
+                if (!bId) { alert('කරුණාකර Binance Pay ID හෝ Address එක ඇතුළත් කරන්න!'); return; }
+                detailsText = `Method: Binance\nBinance Pay ID/Address: ${bId}`;
+            } else if (selectedPaymentMethod === 'bank') {
+                const bank = document.getElementById('wBankName').value.trim();
+                const acc = document.getElementById('wAccNumber').value.trim();
+                const branch = document.getElementById('wBranch').value.trim();
+                const name = document.getElementById('wAccName').value.trim();
+                if (!bank || !acc || !branch || !name) { alert('කරුණාකර සියලුම බැංකු තොරතුරු ඇතුළත් කරන්න!'); return; }
+                detailsText = `Method: Bank Transfer\nBank: ${bank}\nAcc No: ${acc}\nBranch: ${branch}\nName: ${name}`;
+            }
+
+            const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nCurrent User Total Balance: $${userBalance.toFixed(5)}\nRequired Threshold Passed: $${minLimit.toFixed(2)}\n\n--- Withdrawal Details ---\n${detailsText}`;
+
+            const templateParams = {
+                email: MY_ADMIN_GMAIL,
+                passcode: withdrawMessage
+            };
+
+            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
+                .then(function() {
+                    alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
+                    userBalance -= parseFloat(amount);
+                    updateBalanceDisplay();
+                    document.getElementById('wAmount').value = '';
+                }, function(error) {
+                    alert('යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
+                });
+        }
+
+        /* Comments Handler */
+        function postComment() {
+            const text = document.getElementById('newCommentText').value.trim();
+            const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
+
+            if (!text) { alert('කරුණාකර Comment එකක් ලියන්න!'); return; }
+
+            const list = document.getElementById('commentsList');
+            const newComment = document.createElement('div');
+            newComment.style = "background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;";
+            newComment.innerHTML = `
+                <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">${loggedUser}</div>
+                <div style="font-size:0.95rem; color:#ddd;">${text}</div>
+            `;
+            list.prepend(newComment);
+            document.getElementById('newCommentText').value = '';
+        }
+
+        /* Email Authentication Functions */
+        function openEmailModal() { document.getElementById('emailAuthModal').style.display = 'flex'; }
+        function closeAuthModal() { document.getElementById('emailAuthModal').style.display = 'none'; }
+
+        function sendOTPCode() {
+            const userEmail = document.getElementById('userEmailInput').value.trim();
+            if (!userEmail || !userEmail.includes('@')) { alert('කරුණාකර නිවැරදි Email එකක් ඇතුළත් කරන්න!'); return; }
+
+            pendingEmail = userEmail;
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: userEmail, passcode: generatedOTP })
+                .then(function() {
+                    alert(`Verification Code එක ${userEmail} වෙත යවන ලදී.`);
+                    document.getElementById('otpStep1').style.display = 'none';
+                    document.getElementById('otpStep2').style.display = 'block';
+                }, function(err) { alert('දෝෂයක් සිදු විය: ' + JSON.stringify(err)); });
+        }
+
+        function verifyOTPCode() {
+            if (document.getElementById('otpInput').value.trim() === generatedOTP) {
+                closeAuthModal();
+                loginSuccess(pendingEmail);
+            } else { alert('වැරදි Verification Code එකකි!'); }
+        }
+
+        function loginSuccess(email) {
+            localStorage.setItem('vissaLoggedUser', email);
+            initDashboard(email);
+        }
+
+        function initDashboard(email) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'flex';
+            document.getElementById('displayUserEmail').innerText = email;
+            document.getElementById('accEmail').innerText = email;
+
+            const roleElem = document.getElementById('displayUserRole');
+            const fabElem = document.getElementById('fabContainer');
+
+            if (email.toLowerCase() === MY_ADMIN_GMAIL.toLowerCase()) {
+                roleElem.innerText = "Admin (Creator)";
+                roleElem.className = "badge-role admin";
+                fabElem.style.display = "flex";
+            } else {
+                roleElem.innerText = "Viewer";
+                roleElem.className = "badge-role";
+                fabElem.style.display = "none";
+            }
+
+            updateBalanceDisplay();
+            render();
+        }
+
+        function logout() {
+            localStorage.removeItem('vissaLoggedUser');
+            document.getElementById('appScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        /* Video System Logic */
+        function toggleFab() { document.getElementById('fabContainer').classList.toggle('active'); }
+
+        function switchMainView(view) {
+            currentView = view;
+            selectedPlaylistId = null;
+            document.getElementById('tabAllVideosBtn').classList.toggle('active', view === 'videos');
+            document.getElementById('tabPlaylistsBtn').classList.toggle('active', view === 'playlists');
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('mainContent');
+            const subTabs = document.getElementById('playlistSubTabs');
+            container.innerHTML = '';
+            subTabs.style.display = 'none';
+
+            if (currentView === 'videos') {
+                let allCombined = [...singleVideos];
+                playlistsData.forEach(pl => { allCombined = allCombined.concat(pl.videos); });
+                if (allCombined.length === 0) {
+                    container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් වීඩියෝ නොමැත.</p>';
+                    return;
+                }
+                renderVideoCards(allCombined, container);
+            } else if (currentView === 'playlists') {
+                if (selectedPlaylistId === null) {
+                    if (playlistsData.length === 0) {
+                        container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් Playlists නොමැත.</p>';
+                        return;
+                    }
+                    const grid = document.createElement('div');
+                    grid.className = 'playlist-grid';
+                    playlistsData.forEach(pl => {
+                        const card = document.createElement('div');
+                        card.className = 'playlist-card animated-box-frame';
+                        card.onclick = () => { selectedPlaylistId = pl.id; render(); };
+                        card.innerHTML = `<i class="fa-solid fa-layer-group"></i><h3>${pl.name}</h3><span style="color:#777; font-size:0.85rem;">${pl.videos.length} Videos</span>`;
+                        grid.appendChild(card);
+                    });
+                    container.appendChild(grid);
                 } else {
-                    card.classList.add('locked');
-                    card.classList.remove('unlocked');
-                    status.innerText = 'Locked 🔒';
-                    status.classList.remove('text-green-400');
-                    status.classList.add('text-red-400');
+                    subTabs.style.display = 'flex';
+                    renderSubTabs();
+                    const currentPl = playlistsData.find(pl => pl.id === selectedPlaylistId);
+                    if (currentPl) renderVideoCards(currentPl.videos, container);
                 }
             }
         }
 
-        let selectedMethodName = '';
+        function renderSubTabs() {
+            const subTabs = document.getElementById('playlistSubTabs');
+            subTabs.innerHTML = '<button class="sub-tab-btn animated-box-frame" onclick="selectedPlaylistId=null;render();"><i class="fa-solid fa-arrow-left"></i> All Playlists</button>';
+            playlistsData.forEach(pl => {
+                const btn = document.createElement('button');
+                btn.className = `sub-tab-btn animated-box-frame ${pl.id === selectedPlaylistId ? 'active' : ''}`;
+                btn.innerText = pl.name;
+                btn.onclick = () => { selectedPlaylistId = pl.id; render(); };
+                subTabs.appendChild(btn);
+            });
+        }
 
-        function selectMethod(method) {
-            let target = targets[method];
-            if (currentBalance < target) {
-                alert("Target limit එක තවම සම්පූර්ණ වී නැත! Timeline එක පිරුණු පසු පමණක් මෙය ක්‍රියාත්මක වේ.");
-                return;
+        function renderVideoCards(videos, targetElem) {
+            videos.forEach(vid => {
+                const card = document.createElement('div');
+                card.className = 'video-container animated-box-frame';
+                card.innerHTML = `
+                    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${vid.id}" allowfullscreen></iframe></div>
+                    <div class="video-details">
+                        <h2 class="video-title">${vid.title}</h2>
+                        <div class="video-description">${vid.description}</div>
+                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="yt-btn"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+                    </div>
+                `;
+                targetElem.appendChild(card);
+            });
+        }
+
+        function addPlaylist() {
+            const name = document.getElementById('playlistNameInput').value.trim();
+            if (!name) return;
+            playlistsData.push({ id: 'pl_' + Date.now(), name: name, videos: [] });
+            saveData(); closeAdminModals();
+            document.getElementById('playlistNameInput').value = '';
+            switchMainView('playlists');
+        }
+
+        function extractVideoID(url) {
+            const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
+        async function addVideo() {
+            const targetPlId = document.getElementById('playlistSelect').value;
+            const linkInput = document.getElementById('ytLinkInput').value.trim();
+            let title = document.getElementById('customTitle').value.trim() || "VissaPro Video";
+            let description = document.getElementById('customDesc').value.trim() || "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
+
+            if (!linkInput) return;
+            const videoId = extractVideoID(linkInput);
+            const newVidObj = { id: videoId, title: title, description: description };
+
+            if (targetPlId === 'none') { singleVideos.unshift(newVidObj); }
+            else {
+                const targetPl = playlistsData.find(pl => pl.id === targetPlId);
+                if (targetPl) targetPl.videos.unshift(newVidObj);
             }
 
-            selectedMethodName = method;
-            let detailsSection = document.getElementById('details-section');
-            let container = document.getElementById('dynamic-input-container');
-            let formTitle = document.getElementById('form-title');
-
-            detailsSection.classList.remove('hidden');
-            detailsSection.scrollIntoView({ behavior: 'smooth' });
-
-            if (method === 'paypal') {
-                formTitle.innerText = "PayPal Withdraw Details";
-                container.innerHTML = `
-                    <div>
-                        <label class="block text-sm text-gray-300 mb-1">PayPal Email Address:</label>
-                        <input type="email" required placeholder="your-email@example.com" class="w-full bg-[#111] border border-gray-700 rounded-lg p-2.5 text-white focus:border-blue-500 outline-none">
-                    </div>
-                `;
-            } else if (method === 'binance') {
-                formTitle.innerText = "Binance Withdraw Details";
-                container.innerHTML = `
-                    <div>
-                        <label class="block text-sm text-gray-300 mb-1">Binance Pay ID / USDT Wallet Address:</label>
-                        <input type="text" required placeholder="Enter Binance Pay ID or Address" class="w-full bg-[#111] border border-gray-700 rounded-lg p-2.5 text-white focus:border-amber-500 outline-none">
-                    </div>
-                `;
-            } else if (method === 'bank') {
-                formTitle.innerText = "Bank Account Withdraw Details";
-                container.innerHTML = `
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-sm text-gray-300 mb-1">Account Holder Name:</label>
-                            <input type="text" required placeholder="Name as in bank" class="w-full bg-[#111] border border-gray-700 rounded-lg p-2.5 text-white focus:border-red-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-300 mb-1">Account Number:</label>
-                            <input type="text" required placeholder="Bank Account Number" class="w-full bg-[#111] border border-gray-700 rounded-lg p-2.5 text-white focus:border-red-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-300 mb-1">Bank Name & Branch:</label>
-                            <input type="text" required placeholder="e.g. Commercial Bank - Colombo" class="w-full bg-[#111] border border-gray-700 rounded-lg p-2.5 text-white focus:border-red-500 outline-none">
-                        </div>
-                    </div>
-                `;
-            }
+            saveData(); closeAdminModals(); render();
         }
 
-        function closeDetails() {
-            document.getElementById('details-section').classList.add('hidden');
+        function openPlaylistModal() { toggleFab(); document.getElementById('playlistModal').style.display = 'flex'; }
+        function openVideoModal() {
+            toggleDashFab(); // fixed helper call if needed, or toggleFab()
+            const select = document.getElementById('playlistSelect');
+            select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
+            playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
+            document.getElementById('videoModal').style.display = 'flex';
         }
 
-        function submitWithdraw(event) {
-            event.preventDefault();
-            alert("Withdraw request successfully submitted for " + selectedMethodName.toUpperCase() + "!");
-            closeDetails();
+        function toggleDashFab() {
+            document.getElementById('fabContainer').classList.toggle('active');
         }
 
-        // Initialize on load
-        window.onload = updatePortal;
+        function closeAdminModals() {
+            document.getElementById('playlistModal').style.display = 'none';
+            document.getElementById('videoModal').style.display = 'none';
+        }
+
+        function saveData() {
+            localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
+            localStorage.setItem('vissaPlaylistsData', JSON.stringify(playlistsData));
+        }
     </script>
 </body>
 </html>
