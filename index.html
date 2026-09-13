@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VissaPro - Authentication & Portal</title>
+    <title>VissaPro - E-Money Hub & Portal</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -25,6 +25,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
         /* ------------------ LOGIN SCREEN STYLES ------------------ */
@@ -100,22 +101,11 @@
             filter: brightness(1.1);
         }
 
-        .btn-google {
-            background-color: #ffffff;
-            color: #222222;
-        }
+        .btn-google { background-color: #ffffff; color: #222222; }
+        .btn-facebook { background-color: #1877f2; color: #ffffff; }
+        .btn-email { background-color: #ff0000; color: #ffffff; }
 
-        .btn-facebook {
-            background-color: #1877f2;
-            color: #ffffff;
-        }
-
-        .btn-email {
-            background-color: #ff0000;
-            color: #ffffff;
-        }
-
-        /* Modal for Email OTP Verification */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -124,7 +114,7 @@
             background: rgba(0, 0, 0, 0.85);
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 3000;
             padding: 20px;
         }
 
@@ -136,18 +126,9 @@
             max-width: 400px;
         }
 
-        .modal-content h3 {
-            margin-bottom: 10px;
-            color: #fff;
-        }
-
-        .modal-content p {
-            font-size: 0.85rem;
-            color: #aaa;
-            margin-bottom: 15px;
-        }
-
-        .modal-content input {
+        .modal-content h3 { margin-bottom: 10px; color: #fff; }
+        .modal-content p { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
+        .modal-content input, .modal-content textarea {
             width: 100%;
             padding: 12px;
             margin-bottom: 15px;
@@ -164,25 +145,8 @@
             gap: 10px;
         }
 
-        .btn-submit {
-            background-color: #ff0000;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-cancel {
-            background-color: #444;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
+        .btn-submit { background-color: #ff0000; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-cancel { background-color: #444; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
 
         /* ------------------ MAIN APP SCREEN STYLES ------------------ */
         .app-wrapper {
@@ -192,6 +156,7 @@
             padding: 20px;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
 
         .top-navbar {
@@ -200,10 +165,51 @@
             justify-content: space-between;
             align-items: center;
             background: #181818;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 30px;
             margin-bottom: 25px;
             border: 1px solid #333;
+        }
+
+        /* ONLINE USERS WIDGET (LEFT CORNER) */
+        .online-users-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #222;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .online-users-badge i { color: #aaa; }
+
+        /* Animated Pulsing Green Dot */
+        .green-pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #38ef7d;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.7);
+            animation: pulse-green 1.6s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(56, 239, 125, 0.8);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(56, 239, 125, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(56, 239, 125, 0);
+            }
         }
 
         .user-badge {
@@ -213,9 +219,7 @@
             font-size: 0.9rem;
         }
 
-        .user-badge i {
-            color: #ff0000;
-        }
+        .user-badge i { color: #ff0000; }
 
         .badge-role {
             background: #333;
@@ -226,41 +230,122 @@
             margin-left: 5px;
         }
 
-        .badge-role.admin {
-            background: #ff0000;
-            color: #fff;
+        .badge-role.admin { background: #ff0000; color: #fff; }
+
+        .nav-right-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .btn-logout {
-            background: #333;
-            color: #fff;
+        .menu-hamburger-btn {
+            background: none;
             border: none;
-            padding: 6px 14px;
-            border-radius: 15px;
+            color: #ffffff;
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 0.8rem;
-            transition: background 0.2s;
+            transition: color 0.2s;
         }
 
-        .btn-logout:hover {
-            background: #555;
+        .menu-hamburger-btn:hover { color: #ff0000; }
+
+        /* RIGHT SLIDE-OUT MENU (DRAWER) */
+        .side-menu-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2500;
+            display: none;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 25px;
+        .side-menu-drawer {
+            position: fixed;
+            top: 0; right: -300px;
+            width: 280px; height: 100vh;
+            background-color: #141414;
+            border-left: 1px solid #2a2a2a;
+            z-index: 2600;
+            transition: right 0.3s ease;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
         }
+
+        .side-menu-drawer.open { right: 0; }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #252525;
+            margin-bottom: 20px;
+        }
+
+        .drawer-header h3 { font-size: 1.2rem; color: #fff; }
+
+        .close-drawer-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .close-drawer-btn:hover { color: #fff; }
+
+        .drawer-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drawer-nav-item button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #ccc;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-nav-item button i { width: 20px; color: #ff0000; }
+
+        .drawer-nav-item button:hover, .drawer-nav-item button.active {
+            background-color: #222;
+            color: #fff;
+        }
+
+        .drawer-nav-item button.highlight-green {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: #000;
+        }
+
+        /* ------------------ VIEWS CONTAINER ------------------ */
+        .page-view { display: none; width: 100%; }
+        .page-view.active-view { display: block; }
+
+        /* Video / Home Tab Styles */
+        header { text-align: center; margin-bottom: 25px; }
 
         .profile-img {
-            width: 100px;
-            height: 100px;
+            width: 100px; height: 100px;
             border-radius: 50%;
             border: 3px solid #ff0000;
             object-fit: cover;
             margin-bottom: 12px;
         }
 
-        /* Main Nav Tabs */
         .main-tabs-container {
             width: 100%;
             display: flex;
@@ -292,7 +377,6 @@
             border-color: #ff0000;
         }
 
-        /* Sub Tabs */
         .sub-tabs-container {
             width: 100%;
             margin-bottom: 25px;
@@ -315,16 +399,8 @@
             font-weight: 600;
         }
 
-        .sub-tab-btn.active {
-            background-color: #ffffff;
-            color: #000;
-        }
+        .sub-tab-btn.active { background-color: #ffffff; color: #000; }
 
-        .content-container {
-            width: 100%;
-        }
-
-        /* Playlist Grid */
         .playlist-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -345,18 +421,9 @@
             text-align: center;
         }
 
-        .playlist-card:hover {
-            transform: translateY(-5px);
-            border-color: #ff0000;
-        }
+        .playlist-card:hover { transform: translateY(-5px); border-color: #ff0000; }
+        .playlist-card i { font-size: 40px; color: #ff0000; margin-bottom: 12px; }
 
-        .playlist-card i {
-            font-size: 40px;
-            color: #ff0000;
-            margin-bottom: 12px;
-        }
-
-        /* Video List */
         .video-container {
             background-color: #1f1f1f;
             border-radius: 12px;
@@ -374,110 +441,160 @@
         }
 
         .video-wrapper iframe {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            border: 0;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border: 0;
         }
 
-        .video-details {
-            padding: 20px;
-        }
-
-        .video-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
+        .video-details { padding: 20px; }
+        .video-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
         .video-description {
-            color: #ccc;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            background-color: #2a2a2a;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #ff0000;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-            max-height: 140px;
-            overflow-y: auto;
+            color: #ccc; font-size: 0.95rem; line-height: 1.6;
+            background-color: #2a2a2a; padding: 12px;
+            border-radius: 8px; border-left: 4px solid #ff0000;
+            margin-bottom: 15px; white-space: pre-wrap;
+            max-height: 140px; overflow-y: auto;
         }
 
         .yt-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #ff0000;
-            color: #ffffff;
-            padding: 8px 18px;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            display: inline-flex; align-items: center; gap: 8px;
+            background-color: #ff0000; color: #ffffff;
+            padding: 8px 18px; text-decoration: none;
+            font-weight: bold; border-radius: 20px; font-size: 0.9rem;
         }
 
-        /* Floating (+) Button - Only for Admin */
+        /* ------------------ MAKE MONEY (EARN ADS) PAGE STYLES ------------------ */
+        .earn-container {
+            background-color: #181818;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+        }
+
+        .earn-banner {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border-radius: 12px;
+            padding: 25px;
+            color: #000;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .earn-banner h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .earn-banner p { font-size: 1rem; font-weight: 600; opacity: 0.9; }
+
+        .ad-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .ad-card {
+            background-color: #222;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease;
+        }
+
+        .ad-card:hover { transform: translateY(-4px); border-color: #38ef7d; }
+
+        .ad-badge {
+            align-self: flex-start;
+            background: rgba(56, 239, 125, 0.2);
+            color: #38ef7d;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ad-title { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+        .ad-desc { color: #aaa; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.4; }
+
+        .btn-watch-ad {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(45deg, #ff0000, #ff5252);
+            color: #ffffff;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .btn-watch-ad:hover { transform: scale(1.02); filter: brightness(1.1); }
+
+        /* ------------------ COMMENTS PAGE STYLES ------------------ */
+        .comments-box {
+            background-color: #181818;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .comment-input-group { margin-bottom: 25px; }
+        .comment-input-group textarea {
+            width: 100%; height: 90px;
+            background: #111; border: 1px solid #444;
+            border-radius: 8px; color: #fff; padding: 12px;
+            font-size: 0.95rem; margin-bottom: 10px;
+        }
+
+        .comment-item {
+            background-color: #222;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 3px solid #ff0000;
+        }
+
+        .comment-author { font-size: 0.85rem; color: #ff0000; font-weight: bold; margin-bottom: 4px; }
+        .comment-text { font-size: 0.95rem; color: #ddd; }
+
+        /* Floating (+) Admin Button */
         .fab-container {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 30px; right: 30px;
             display: none;
             flex-direction: column-reverse;
             align-items: flex-end;
             gap: 12px;
-            z-index: 1000;
+            z-index: 2000;
         }
 
         .fab-main {
-            width: 60px;
-            height: 60px;
-            background-color: #ff0000;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 26px;
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
-            cursor: pointer;
-            border: none;
-            transition: transform 0.3s ease;
+            width: 60px; height: 60px;
+            background-color: #ff0000; color: white;
+            border-radius: 50%; display: flex;
+            justify-content: center; align-items: center;
+            font-size: 26px; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
+            cursor: pointer; border: none; transition: transform 0.3s ease;
         }
 
-        .fab-container.active .fab-main {
-            transform: rotate(45deg);
-            background-color: #444;
-        }
-
-        .fab-options {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .fab-container.active .fab-options {
-            display: flex;
-        }
+        .fab-container.active .fab-main { transform: rotate(45deg); background-color: #444; }
+        .fab-options { display: none; flex-direction: column; gap: 10px; align-items: flex-end; }
+        .fab-container.active .fab-options { display: flex; }
 
         .fab-option-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: #222;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 25px;
-            border: 1px solid #444;
-            cursor: pointer;
-            font-weight: 600;
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 10px;
+            background-color: #222; color: white;
+            padding: 10px 16px; border-radius: 25px;
+            border: 1px solid #444; cursor: pointer;
+            font-weight: 600; white-space: nowrap;
         }
-
-        .fab-option-btn i {
-            color: #ff0000;
-        }
+        .fab-option-btn i { color: #ff0000; }
     </style>
 </head>
 <body>
@@ -489,20 +606,15 @@
         <div class="login-card">
             <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="login-profile-img">
             <h2><span>VissaPro</span> Hub</h2>
-            <p class="desc">වීඩියෝ නැරඹීමට හෝ එකතු කිරීමට කරුණාකර Log in වන්න.</p>
+            <p class="desc">වීඩියෝ නැරඹීමට හෝ E-Money Portal එකට පිවිසීමට Log in වන්න.</p>
 
             <div class="auth-btn-group">
-                <!-- Google Sign-In Button -->
                 <button class="auth-btn btn-google" onclick="triggerGoogleLogin()">
                     <i class="fa-brands fa-google" style="color: #ea4335;"></i> Sign in with Google
                 </button>
-
-                <!-- Facebook Sign-In Button -->
                 <button class="auth-btn btn-facebook" onclick="triggerFacebookLogin()">
                     <i class="fa-brands fa-facebook-f"></i> Sign in with Facebook
                 </button>
-
-                <!-- Email OTP Verification Button -->
                 <button class="auth-btn btn-email" onclick="openEmailModal()">
                     <i class="fa-solid fa-envelope"></i> Email Verification Sign In
                 </button>
@@ -516,7 +628,6 @@
             <h3 id="emailModalTitle">Email Sign In</h3>
             <p id="emailModalDesc">ඔබගේ Email එක ඇතුළත් කර Verification Code (OTP) එක ලබාගන්න.</p>
 
-            <!-- Step 1: Input Email -->
             <div id="otpStep1">
                 <input type="email" id="userEmailInput" placeholder="example@gmail.com">
                 <div class="modal-buttons">
@@ -525,7 +636,6 @@
                 </div>
             </div>
 
-            <!-- Step 2: Input OTP Code -->
             <div id="otpStep2" style="display: none;">
                 <input type="text" id="otpInput" placeholder="Enter 6-digit Code (e.g. 123456)">
                 <div class="modal-buttons">
@@ -536,46 +646,186 @@
         </div>
     </div>
 
-
     <!-- ================================================================= -->
-    <!-- SECTION 2: MAIN APP DASHBOARD -->
+    <!-- SECTION 2: MAIN APP DASHBOARD WITH TOP BAR & SIDE MENU -->
     <!-- ================================================================= -->
     <div class="app-wrapper" id="appScreen">
         
         <!-- Top Navbar -->
         <div class="top-navbar">
-            <div class="user-badge">
-                <i class="fa-solid fa-user-circle"></i>
-                <span id="displayUserEmail">user@gmail.com</span>
-                <span id="displayUserRole" class="badge-role">Viewer</span>
+            <!-- LEFT CORNER: ONLINE USERS COUNTER WITH ANIMATED GREEN DOT -->
+            <div class="online-users-badge">
+                <i class="fa-solid fa-users"></i>
+                <span>Users: <strong id="onlineCountNumber">14</strong></span>
+                <span class="green-pulse-dot"></span>
             </div>
-            <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+
+            <!-- RIGHT CORNER: HAMBURGER MENU BUTTON -->
+            <div class="nav-right-actions">
+                <button class="menu-hamburger-btn" onclick="toggleSideMenu()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Header -->
-        <header>
-            <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="profile-img">
-            <h1>Welcome to <span>VissaPro</span> Hub</h1>
-            <p style="color:#aaa;">ඔබට අවශ්‍ය වීඩියෝ සහ Playlists මෙතැනින් බලන්න!</p>
-        </header>
+        <!-- RIGHT SLIDE-OUT MENU (DRAWER) -->
+        <div class="side-menu-overlay" id="menuOverlay" onclick="toggleSideMenu()"></div>
+        <div class="side-menu-drawer" id="sideDrawer">
+            <div class="drawer-header">
+                <h3>VissaPro Menu</h3>
+                <button class="close-drawer-btn" onclick="toggleSideMenu()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
-        <!-- Main Tabs -->
-        <div class="main-tabs-container">
-            <button class="main-tab-btn active" id="tabAllVideosBtn" onclick="switchMainView('videos')">
-                <i class="fa-solid fa-play"></i> All Videos
-            </button>
-            <button class="main-tab-btn" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
-                <i class="fa-solid fa-folder-open"></i> All Playlists
-            </button>
+            <!-- User Info Inside Drawer Header -->
+            <div style="padding: 10px 15px; background: #1f1f1f; border-radius: 8px; margin-bottom: 15px;">
+                <div class="user-badge">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <span id="displayUserEmail">user@gmail.com</span>
+                </div>
+                <div style="margin-top: 5px;">
+                    <span id="displayUserRole" class="badge-role">Viewer</span>
+                </div>
+            </div>
+
+            <ul class="drawer-nav-list">
+                <li class="drawer-nav-item">
+                    <button id="navHome" class="active" onclick="switchPageView('home')">
+                        <i class="fa-solid fa-house"></i> Home (Videos)
+                    </button>
+                </li>
+                <li class="drawer-nav-item">
+                    <button id="navMakeMoney" class="highlight-green" onclick="switchPageView('makemoney')">
+                        <i class="fa-solid fa-sack-dollar" style="color:#000;"></i> Make Money
+                    </button>
+                </li>
+                <li class="drawer-nav-item">
+                    <button id="navComments" onclick="switchPageView('comments')">
+                        <i class="fa-solid fa-comments"></i> Your Comments
+                    </button>
+                </li>
+                <li class="drawer-nav-item">
+                    <button id="navAccount" onclick="switchPageView('account')">
+                        <i class="fa-solid fa-user-gear"></i> Your Account
+                    </button>
+                </li>
+                <li class="drawer-nav-item" style="margin-top: 20px;">
+                    <button onclick="logout()" style="color: #ff5252;">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #ff5252;"></i> Logout
+                    </button>
+                </li>
+            </ul>
         </div>
 
-        <!-- Playlist Sub Tabs -->
-        <div class="sub-tabs-container" id="playlistSubTabs"></div>
+        <!-- ============================================================= -->
+        <!-- VIEW 1: HOME PAGE (VIDEOS & PLAYLISTS) -->
+        <!-- ============================================================= -->
+        <div id="viewHome" class="page-view active-view">
+            <header>
+                <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="profile-img">
+                <h1>Welcome to <span>VissaPro</span> Hub</h1>
+                <p style="color:#aaa;">ඔබට අවශ්‍ය E-Money වීඩියෝ සහ Playlists මෙතැනින් බලන්න!</p>
+            </header>
 
-        <!-- Content Container -->
-        <div class="content-container" id="mainContent"></div>
+            <div class="main-tabs-container">
+                <button class="main-tab-btn active" id="tabAllVideosBtn" onclick="switchMainView('videos')">
+                    <i class="fa-solid fa-play"></i> All Videos
+                </button>
+                <button class="main-tab-btn" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
+                    <i class="fa-solid fa-folder-open"></i> All Playlists
+                </button>
+            </div>
 
-        <!-- Floating Admin (+) Menu -->
+            <div class="sub-tabs-container" id="playlistSubTabs"></div>
+            <div class="content-container" id="mainContent"></div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 2: MAKE MONEY PAGE (ADS & EARNINGS) -->
+        <!-- ============================================================= -->
+        <div id="viewMakeMoney" class="page-view">
+            <div class="earn-container">
+                <div class="earn-banner">
+                    <h2><i class="fa-solid fa-coins"></i> Watch Ads & Earn Money</h2>
+                    <p>පහත Ads නැරඹීමෙන් මුදල් සහ Rewards ලබාගන්න!</p>
+                </div>
+
+                <div class="ad-cards-grid">
+                    <!-- Ad Item 1 -->
+                    <div class="ad-card">
+                        <div>
+                            <span class="ad-badge">Reward: $0.10</span>
+                            <div class="ad-title">Trading Basics Sponsored Ad</div>
+                            <div class="ad-desc">තත්පර 30 ක ඇඩ් එක නරඹා ඔබගේ E-Money ගිණුමට ලකුණු එකතු කරගන්න.</div>
+                        </div>
+                        <button class="btn-watch-ad" onclick="watchAdAction('Trading Basics Ad')">
+                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
+                        </button>
+                    </div>
+
+                    <!-- Ad Item 2 -->
+                    <div class="ad-card">
+                        <div>
+                            <span class="ad-badge">Reward: $0.15</span>
+                            <div class="ad-title">Crypto Exchange Special Offer</div>
+                            <div class="ad-desc">Binance Square විශේෂ වීඩියෝ ඇඩ් එක නරඹා Rewards දිනාගන්න.</div>
+                        </div>
+                        <button class="btn-watch-ad" onclick="watchAdAction('Crypto Exchange Ad')">
+                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
+                        </button>
+                    </div>
+
+                    <!-- Ad Item 3 -->
+                    <div class="ad-card">
+                        <div>
+                            <span class="ad-badge">Reward: $0.05</span>
+                            <div class="ad-title">Micro Tasks & Survey Promo</div>
+                            <div class="ad-desc">ලංකාවේ අයට E-Money හොයන්න පුළුවන් ලෙහෙසිම ක්‍රම ගැන දැනගන්න.</div>
+                        </div>
+                        <button class="btn-watch-ad" onclick="watchAdAction('Survey Promo Ad')">
+                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 3: YOUR COMMENTS PAGE -->
+        <!-- ============================================================= -->
+        <div id="viewComments" class="page-view">
+            <div class="comments-box">
+                <h2 style="margin-bottom: 15px;"><i class="fa-solid fa-comments" style="color:#ff0000;"></i> Your Comments & Feedback</h2>
+                
+                <div class="comment-input-group">
+                    <textarea id="newCommentText" placeholder="ඔබගේ අදහස් හෝ ගැටලු මෙතැන සටහන් කරන්න..."></textarea>
+                    <button class="btn-submit" onclick="postComment()">Post Comment</button>
+                </div>
+
+                <div id="commentsList">
+                    <div class="comment-item">
+                        <div class="comment-author">Vimukthi Thuhina (Admin)</div>
+                        <div class="comment-text">සාදරයෙන් පිළිගන්නවා VissaPro E-Money චැනල් එකට! ඕනෑම ගැටලුවක් මෙතනින් අහන්න.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 4: YOUR ACCOUNT PAGE -->
+        <!-- ============================================================= -->
+        <div id="viewAccount" class="page-view">
+            <div class="earn-container" style="text-align: center;">
+                <i class="fa-solid fa-user-astronaut" style="font-size: 60px; color: #ff0000; margin-bottom: 15px;"></i>
+                <h2>Your Account Details</h2>
+                <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: left;">
+                    <p style="margin-bottom: 10px;"><strong>Logged Email:</strong> <span id="accEmail">user@gmail.com</span></p>
+                    <p style="margin-bottom: 10px;"><strong>Account Status:</strong> <span style="color:#38ef7d;">Active</span></p>
+                    <p><strong>Total Earnings:</strong> <span id="accBalance" style="color:#38ef7d; font-weight:bold;">$0.00</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Admin (+) Button -->
         <div class="fab-container" id="fabContainer">
             <button class="fab-main" onclick="toggleFab()"><i class="fa-solid fa-plus"></i></button>
             <div class="fab-options">
@@ -627,7 +877,6 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
             authDomain: "vissapro-aa91d.firebaseapp.com",
@@ -638,12 +887,10 @@
             measurementId: "G-VBNN5652DD"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
 
-        // Make login triggers available globally for HTML buttons
         window.triggerGoogleLogin = function() {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
@@ -651,9 +898,7 @@
                     const email = result.user.email;
                     window.loginSuccess(email);
                 })
-                .catch((error) => {
-                    alert("Google Sign-In Error: " + error.message);
-                });
+                .catch((error) => { alert("Google Sign-In Error: " + error.message); });
         };
 
         window.triggerFacebookLogin = function() {
@@ -663,27 +908,25 @@
                     const email = result.user.email || "facebook_user@vissapro.com";
                     window.loginSuccess(email);
                 })
-                .catch((error) => {
-                    alert("Facebook Sign-In Error: " + error.message);
-                });
+                .catch((error) => { alert("Facebook Sign-In Error: " + error.message); });
         };
     </script>
 
     <script>
-        // EmailJS Init - Integrated Public Key
+        // EmailJS Init
         (function(){
             emailjs.init("PjusIs1VJ5zFRcuZp");
         })();
 
         const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU";
-        
-        // ---------------------------------------------------------------------
-        // 🔑 ADMIN GMAIL ADDRESS
         const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
-        // ---------------------------------------------------------------------
 
         let generatedOTP = null;
         let pendingEmail = "";
+        let userBalance = 0.00;
+
+        // Dynamic Online User Counter Simulation
+        let activeOnlineCount = Math.floor(Math.random() * (25 - 12 + 1)) + 12;
 
         // App Data
         let singleVideos = JSON.parse(localStorage.getItem('vissaSingleVideos')) || [];
@@ -691,16 +934,91 @@
         let currentView = 'videos';
         let selectedPlaylistId = null;
 
-        // Auto Check Session on Load
         window.onload = function() {
             const loggedUser = localStorage.getItem('vissaLoggedUser');
             if (loggedUser) {
                 initDashboard(loggedUser);
             }
+
+            // Start Online Users Simulation Counter
+            startOnlineUsersCounter();
         };
 
-        // --- EMAIL OTP AUTHENTICATION ---
+        /* Online Users Live Counter Logic */
+        function startOnlineUsersCounter() {
+            const countElem = document.getElementById('onlineCountNumber');
+            if (countElem) countElem.innerText = activeOnlineCount;
 
+            setInterval(() => {
+                // Randomly fluctuate online count slightly (+1 or -1) to simulate real users
+                const change = Math.random() > 0.5 ? 1 : -1;
+                activeOnlineCount = Math.max(8, activeOnlineCount + change);
+                if (countElem) {
+                    countElem.innerText = activeOnlineCount;
+                }
+            }, 6000); // Updates every 6 seconds
+        }
+
+        /* Drawer & Page View Navigation */
+        function toggleSideMenu() {
+            const drawer = document.getElementById('sideDrawer');
+            const overlay = document.getElementById('menuOverlay');
+            if (drawer.classList.contains('open')) {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+            }
+        }
+
+        function switchPageView(page) {
+            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active-view'));
+            document.querySelectorAll('.drawer-nav-item button').forEach(btn => btn.classList.remove('active'));
+
+            if (page === 'home') {
+                document.getElementById('viewHome').classList.add('active-view');
+                document.getElementById('navHome').classList.add('active');
+            } else if (page === 'makemoney') {
+                document.getElementById('viewMakeMoney').classList.add('active-view');
+                document.getElementById('navMakeMoney').classList.add('active');
+            } else if (page === 'comments') {
+                document.getElementById('viewComments').classList.add('active-view');
+                document.getElementById('navComments').classList.add('active');
+            } else if (page === 'account') {
+                document.getElementById('viewAccount').classList.add('active-view');
+                document.getElementById('navAccount').classList.add('active');
+            }
+
+            toggleSideMenu();
+        }
+
+        /* Make Money - Ad Handler */
+        function watchAdAction(adTitle) {
+            alert(`" ${adTitle} " Ad එක සාර්ථකව නැරඹුවා! $0.10 ක් ඔබගේ Balance එකට එකතු විය.`);
+            userBalance += 0.10;
+            document.getElementById('accBalance').innerText = '$' + userBalance.toFixed(2);
+        }
+
+        /* Comments Handler */
+        function postComment() {
+            const text = document.getElementById('newCommentText').value.trim();
+            const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
+
+            if (!text) { alert('කරුණාකර Comment එකක් ලියන්න!'); return; }
+
+            const list = document.getElementById('commentsList');
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-item';
+            newComment.innerHTML = `
+                <div class="comment-author">${loggedUser}</div>
+                <div class="comment-text">${text}</div>
+            `;
+            list.prepend(newComment);
+            document.getElementById('newCommentText').value = '';
+        }
+
+        /* Email OTP Handlers */
         function openEmailModal() {
             document.getElementById('emailAuthModal').style.display = 'flex';
             document.getElementById('otpStep1').style.display = 'block';
@@ -721,14 +1039,11 @@
             pendingEmail = userEmail;
             generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
 
-            const templateParams = {
-                email: userEmail,
-                passcode: generatedOTP
-            };
+            const templateParams = { email: userEmail, passcode: generatedOTP };
 
             emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
-                .then(function(response) {
-                    alert(`Verification Code එක ${userEmail} වෙත යවන ලදී. කරුණාකර Inbox/Spam පරීක්ෂා කරන්න.`);
+                .then(function() {
+                    alert(`Verification Code එක ${userEmail} වෙත යවන ලදී. Inbox/Spam පරීක්ෂා කරන්න.`);
                     document.getElementById('otpStep1').style.display = 'none';
                     document.getElementById('otpStep2').style.display = 'block';
                     document.getElementById('emailModalDesc').innerText = `${userEmail} වෙත යවන ලද 6-digit කෝඩ් එක ඇතුළත් කරන්න.`;
@@ -739,7 +1054,6 @@
 
         function verifyOTPCode() {
             const userEnteredOTP = document.getElementById('otpInput').value.trim();
-
             if (userEnteredOTP === generatedOTP) {
                 alert('Email Verification සාර්ථකයි!');
                 closeAuthModal();
@@ -749,7 +1063,6 @@
             }
         }
 
-        // Handle Logged-In State
         function loginSuccess(email) {
             localStorage.setItem('vissaLoggedUser', email);
             initDashboard(email);
@@ -759,11 +1072,11 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'flex';
             document.getElementById('displayUserEmail').innerText = email;
+            document.getElementById('accEmail').innerText = email;
 
             const roleElem = document.getElementById('displayUserRole');
             const fabElem = document.getElementById('fabContainer');
 
-            // Check if user is ADMIN
             if (email.toLowerCase() === MY_ADMIN_GMAIL.toLowerCase()) {
                 roleElem.innerText = "Admin (Creator)";
                 roleElem.className = "badge-role admin";
@@ -783,19 +1096,14 @@
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
-        // --- DASHBOARD UI & RENDER LOGIC ---
-
-        function toggleFab() {
-            document.getElementById('fabContainer').classList.toggle('active');
-        }
+        /* Admin / Video Rendering Functions */
+        function toggleFab() { document.getElementById('fabContainer').classList.toggle('active'); }
 
         function switchMainView(view) {
             currentView = view;
             selectedPlaylistId = null;
-
             document.getElementById('tabAllVideosBtn').classList.toggle('active', view === 'videos');
             document.getElementById('tabPlaylistsBtn').classList.toggle('active', view === 'playlists');
-
             render();
         }
 
@@ -807,9 +1115,7 @@
 
             if (currentView === 'videos') {
                 let allCombined = [...singleVideos];
-                playlistsData.forEach(pl => {
-                    allCombined = allCombined.concat(pl.videos);
-                });
+                playlistsData.forEach(pl => { allCombined = allCombined.concat(pl.videos); });
 
                 if (allCombined.length === 0) {
                     container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් වීඩියෝ නොමැත.</p>';
@@ -823,17 +1129,12 @@
                         container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් Playlists නොමැත.</p>';
                         return;
                     }
-
                     const grid = document.createElement('div');
                     grid.className = 'playlist-grid';
-
                     playlistsData.forEach(pl => {
                         const card = document.createElement('div');
                         card.className = 'playlist-card';
-                        card.onclick = () => {
-                            selectedPlaylistId = pl.id;
-                            render();
-                        };
+                        card.onclick = () => { selectedPlaylistId = pl.id; render(); };
                         card.innerHTML = `
                             <i class="fa-solid fa-layer-group"></i>
                             <h3>${pl.name}</h3>
@@ -842,11 +1143,9 @@
                         grid.appendChild(card);
                     });
                     container.appendChild(grid);
-
                 } else {
                     subTabs.style.display = 'flex';
                     renderSubTabs();
-
                     const currentPl = playlistsData.find(pl => pl.id === selectedPlaylistId);
                     if (currentPl) {
                         if (currentPl.videos.length === 0) {
@@ -862,7 +1161,6 @@
         function renderSubTabs() {
             const subTabs = document.getElementById('playlistSubTabs');
             subTabs.innerHTML = '';
-
             const backBtn = document.createElement('button');
             backBtn.className = 'sub-tab-btn';
             backBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> සියලුම Playlists';
@@ -898,12 +1196,9 @@
             });
         }
 
-        // --- ADMIN ADD CONTENT LOGIC ---
-
         function addPlaylist() {
             const name = document.getElementById('playlistNameInput').value.trim();
             if (!name) { alert('කරුණාකර Playlist එක සඳහා නමක් ඇතුළත් කරන්න!'); return; }
-
             const newId = 'pl_' + Date.now();
             playlistsData.push({ id: newId, name: name, videos: [] });
             saveData();
@@ -940,7 +1235,6 @@
             let description = document.getElementById('customDesc').value.trim();
 
             if (!linkInput) { alert('කරුණාකර YouTube Video Link එකක් ඇතුළත් කරන්න!'); return; }
-
             const videoId = extractVideoID(linkInput);
             const apiData = await fetchVideoDetails(videoId);
 
@@ -978,11 +1272,7 @@
             toggleFab();
             const select = document.getElementById('playlistSelect');
             select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
-
-            playlistsData.forEach(pl => {
-                select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`;
-            });
-
+            playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
             document.getElementById('videoModal').style.display = 'flex';
         }
 
