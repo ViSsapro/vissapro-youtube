@@ -56,49 +56,119 @@
             font-size: 1rem;
         }
 
-        /* Playlists Horizontal Bar */
-        .playlist-tabs-container {
+        /* Navigation Bar (Tabs) */
+        .main-tabs-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #222;
+            padding-bottom: 15px;
+        }
+
+        .main-tab-btn {
+            background-color: #1e1e1e;
+            color: #aaa;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 1px solid #333;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-tab-btn.active, .main-tab-btn:hover {
+            background-color: #ff0000;
+            color: #fff;
+            border-color: #ff0000;
+        }
+
+        /* Category Filter Pills (When inside Playlist View) */
+        .sub-tabs-container {
             width: 100%;
             max-width: 800px;
             margin-bottom: 25px;
             overflow-x: auto;
             white-space: nowrap;
             padding-bottom: 8px;
+            display: none; /* Shown dynamically */
         }
 
-        .playlist-tabs-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        .playlist-tabs-container::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 10px;
-        }
-
-        .tab-btn {
+        .sub-tab-btn {
             display: inline-block;
             background-color: #222;
             color: #ccc;
-            padding: 10px 20px;
-            margin-right: 10px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            margin-right: 8px;
+            border-radius: 18px;
             border: 1px solid #333;
             cursor: pointer;
+            font-size: 0.9rem;
             font-weight: 600;
-            transition: all 0.3s ease;
         }
 
-        .tab-btn.active, .tab-btn:hover {
-            background-color: #ff0000;
-            color: #fff;
-            border-color: #ff0000;
+        .sub-tab-btn.active {
+            background-color: #ffffff;
+            color: #000;
+            font-weight: bold;
         }
 
-        /* Video List Section */
-        .video-list-container {
+        /* Section Container */
+        .content-container {
             width: 100%;
             max-width: 800px;
         }
 
+        /* Playlist Grid Layout */
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .playlist-card {
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .playlist-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff0000;
+        }
+
+        .playlist-card i {
+            font-size: 40px;
+            color: #ff0000;
+            margin-bottom: 12px;
+        }
+
+        .playlist-card h3 {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .playlist-card span {
+            color: #777;
+            font-size: 0.85rem;
+        }
+
+        /* Video List Layout */
         .video-container {
             background-color: #1f1f1f;
             border-radius: 12px;
@@ -228,7 +298,7 @@
             color: #ff0000;
         }
 
-        /* Modal Popups */
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -296,18 +366,28 @@
     <header>
         <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile Photo" class="profile-img">
         <h1>Welcome to <span>VissaPro</span> YouTube Channel</h1>
-        <p class="subtitle">ඔබට අවශ්‍ය ප්‍රධාන මාතෘකාව (Playlist) තෝරා වීඩියෝ නරඹන්න!</p>
+        <p class="subtitle">ඔබට අවශ්‍ය වීඩියෝ සහ Playlists මෙතැනින් බලන්න!</p>
     </header>
 
-    <!-- Playlist Tabs Bar -->
-    <div class="playlist-tabs-container" id="playlistTabs"></div>
+    <!-- Main Navigation Tabs -->
+    <div class="main-tabs-container">
+        <button class="main-tab-btn active" id="tabAllVideosBtn" onclick="switchMainView('videos')">
+            <i class="fa-solid fa-play"></i> All Videos
+        </button>
+        <button class="main-tab-btn" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
+            <i class="fa-solid fa-folder-open"></i> All Playlists
+        </button>
+    </div>
 
-    <!-- Video List Output -->
-    <div class="video-list-container" id="videoList"></div>
+    <!-- Playlist Sub-Tabs (Shown inside Playlists view) -->
+    <div class="sub-tabs-container" id="playlistSubTabs"></div>
+
+    <!-- Dynamic Content Container -->
+    <div class="content-container" id="mainContent"></div>
 
     <!-- Floating Action Menu (+) -->
     <div class="fab-container" id="fabContainer">
-        <button class="fab-main" onclick="toggleFab()"><i class="fa-solid fa-plus"></i></button>
+        <button class="fab-main" onclick="handleFabClick()"><i class="fa-solid fa-plus"></i></button>
         <div class="fab-options">
             <button class="fab-option-btn" onclick="openPlaylistModal()">
                 <i class="fa-solid fa-folder-plus"></i> + Add Playlist
@@ -322,7 +402,7 @@
     <div class="modal" id="playlistModal">
         <div class="modal-content">
             <h3>නව Playlist එකක් සාදන්න</h3>
-            <input type="text" id="playlistNameInput" placeholder="Playlist Name (e.g. Trading Course, Tech Reviews)">
+            <input type="text" id="playlistNameInput" placeholder="Playlist Name (e.g. Trading Course)">
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModals()">Cancel</button>
                 <button class="btn-submit" onclick="addPlaylist()">Create Playlist</button>
@@ -334,8 +414,10 @@
     <div class="modal" id="videoModal">
         <div class="modal-content">
             <h3>නව Video එකක් එකතු කරන්න</h3>
-            <label style="color:#aaa; font-size:0.85rem; margin-bottom:5px; display:block;">Playlist එක තෝරන්න:</label>
-            <select id="playlistSelect"></select>
+            <label style="color:#aaa; font-size:0.85rem; margin-bottom:5px; display:block;">Playlist එකක් තෝරන්න (අවශ්‍ය නම් පමණක්):</label>
+            <select id="playlistSelect">
+                <option value="none">-- None (Single Video / Direct Upload) --</option>
+            </select>
 
             <input type="text" id="ytLinkInput" placeholder="YouTube Link (e.g., https://youtu.be/xxx)">
             <input type="text" id="customTitle" placeholder="Title (Auto-fetch නොවුවහොත් පමණක් ලියන්න)">
@@ -348,58 +430,131 @@
     </div>
 
     <script>
-        // YouTube API Key
         const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU";
+        const ADMIN_PASSWORD = "1234"; 
+        let isAuthenticated = false;
 
-        // LocalStorage Data Init
-        let playlistsData = JSON.parse(localStorage.getItem('vissaPlaylists')) || [
-            { id: 'all', name: 'All Videos', videos: [] }
-        ];
+        // Data Structure
+        let singleVideos = JSON.parse(localStorage.getItem('vissaSingleVideos')) || [];
+        let playlistsData = JSON.parse(localStorage.getItem('vissaPlaylistsData')) || [];
 
-        let currentActiveTab = 'all';
+        let currentView = 'videos'; // 'videos' or 'playlists'
+        let selectedPlaylistId = null; // null means viewing playlist list
+
+        function handleFabClick() {
+            if (!isAuthenticated) {
+                const inputPass = prompt("Admin Password එක ඇතුළත් කරන්න:");
+                if (inputPass === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    alert("Password සාර්ථකයි! දැන් ඔබට Videos එකතු කළ හැක.");
+                    toggleFab();
+                } else if (inputPass !== null) {
+                    alert("වැරදි Password එකක්!");
+                }
+            } else {
+                toggleFab();
+            }
+        }
 
         function toggleFab() {
             document.getElementById('fabContainer').classList.toggle('active');
         }
 
-        function renderTabs() {
-            const tabsContainer = document.getElementById('playlistTabs');
-            tabsContainer.innerHTML = '';
+        function switchMainView(view) {
+            currentView = view;
+            selectedPlaylistId = null;
+
+            document.getElementById('tabAllVideosBtn').classList.toggle('active', view === 'videos');
+            document.getElementById('tabPlaylistsBtn').classList.toggle('active', view === 'playlists');
+
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('mainContent');
+            const subTabs = document.getElementById('playlistSubTabs');
+            container.innerHTML = '';
+            subTabs.style.display = 'none';
+
+            if (currentView === 'videos') {
+                // Show ALL Videos (Single Videos + Playlist Videos combined)
+                let allCombined = [...singleVideos];
+                playlistsData.forEach(pl => {
+                    allCombined = allCombined.concat(pl.videos);
+                });
+
+                if (allCombined.length === 0) {
+                    container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් වීඩියෝ නොමැත. පල්ලෙහා (+) icon එකෙන් එකතු කරන්න.</p>';
+                    return;
+                }
+                renderVideoCards(allCombined, container);
+
+            } else if (currentView === 'playlists') {
+                if (selectedPlaylistId === null) {
+                    // Render Playlists Grid Overview
+                    if (playlistsData.length === 0) {
+                        container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් Playlists නොමැත. පල්ලෙහා (+) icon එකෙන් Playlist එකක් සාදන්න.</p>';
+                        return;
+                    }
+
+                    const grid = document.createElement('div');
+                    grid.className = 'playlist-grid';
+
+                    playlistsData.forEach(pl => {
+                        const card = document.createElement('div');
+                        card.className = 'playlist-card';
+                        card.onclick = () => {
+                            selectedPlaylistId = pl.id;
+                            render();
+                        };
+                        card.innerHTML = `
+                            <i class="fa-solid fa-layer-group"></i>
+                            <h3>${pl.name}</h3>
+                            <span>${pl.videos.length} Videos</span>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    container.appendChild(grid);
+
+                } else {
+                    // Render Specific Playlist Videos
+                    subTabs.style.display = 'flex';
+                    renderSubTabs();
+
+                    const currentPl = playlistsData.find(pl => pl.id === selectedPlaylistId);
+                    if (currentPl) {
+                        if (currentPl.videos.length === 0) {
+                            container.innerHTML = `<p style="color:#888; text-align:center; padding:40px;">"${currentPl.name}" එකේ තවමත් වීඩියෝ නොමැත.</p>`;
+                        } else {
+                            renderVideoCards(currentPl.videos, container);
+                        }
+                    }
+                }
+            }
+        }
+
+        function renderSubTabs() {
+            const subTabs = document.getElementById('playlistSubTabs');
+            subTabs.innerHTML = '';
+
+            // Back to all playlists button
+            const backBtn = document.createElement('button');
+            backBtn.className = 'sub-tab-btn';
+            backBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> සියලුම Playlists';
+            backBtn.onclick = () => { selectedPlaylistId = null; render(); };
+            subTabs.appendChild(backBtn);
 
             playlistsData.forEach(pl => {
                 const btn = document.createElement('button');
-                btn.className = `tab-btn ${pl.id === currentActiveTab ? 'active' : ''}`;
+                btn.className = `sub-tab-btn ${pl.id === selectedPlaylistId ? 'active' : ''}`;
                 btn.innerText = pl.name;
-                btn.onclick = () => {
-                    currentActiveTab = pl.id;
-                    renderTabs();
-                    renderVideos();
-                };
-                tabsContainer.appendChild(btn);
+                btn.onclick = () => { selectedPlaylistId = pl.id; render(); };
+                subTabs.appendChild(btn);
             });
         }
 
-        function renderVideos() {
-            const listContainer = document.getElementById('videoList');
-            listContainer.innerHTML = '';
-
-            let videosToDisplay = [];
-
-            if (currentActiveTab === 'all') {
-                playlistsData.forEach(pl => {
-                    videosToDisplay = videosToDisplay.concat(pl.videos);
-                });
-            } else {
-                const selectedPl = playlistsData.find(pl => pl.id === currentActiveTab);
-                if (selectedPl) videosToDisplay = selectedPl.videos;
-            }
-
-            if (videosToDisplay.length === 0) {
-                listContainer.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">මෙම Playlist එකේ තවමත් වීඩියෝ නොමැත. පල්ලෙහා (+) icon එකෙන් එකතු කරන්න.</p>';
-                return;
-            }
-
-            videosToDisplay.forEach(vid => {
+        function renderVideoCards(videos, targetElem) {
+            videos.forEach(vid => {
                 const card = document.createElement('div');
                 card.className = 'video-container';
                 card.innerHTML = `
@@ -414,7 +569,7 @@
                         </a>
                     </div>
                 `;
-                listContainer.appendChild(card);
+                targetElem.appendChild(card);
             });
         }
 
@@ -424,9 +579,10 @@
 
             const newId = 'pl_' + Date.now();
             playlistsData.push({ id: newId, name: name, videos: [] });
-            saveAndRefresh();
+            saveData();
             closeModals();
             document.getElementById('playlistNameInput').value = '';
+            switchMainView('playlists');
         }
 
         function extractVideoID(url) {
@@ -469,15 +625,23 @@
             if (!title) title = "VissaPro Video";
             if (!description) description = "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
 
-            const targetPl = playlistsData.find(pl => pl.id === targetPlId);
-            if (targetPl) {
-                targetPl.videos.unshift({ id: videoId, title: title, description: description });
-                saveAndRefresh();
-                closeModals();
-                document.getElementById('ytLinkInput').value = '';
-                document.getElementById('customTitle').value = '';
-                document.getElementById('customDesc').value = '';
+            const newVidObj = { id: videoId, title: title, description: description };
+
+            if (targetPlId === 'none') {
+                // Save as Single Independent Video
+                singleVideos.unshift(newVidObj);
+            } else {
+                // Save inside specific Playlist
+                const targetPl = playlistsData.find(pl => pl.id === targetPlId);
+                if (targetPl) targetPl.videos.unshift(newVidObj);
             }
+
+            saveData();
+            closeModals();
+            document.getElementById('ytLinkInput').value = '';
+            document.getElementById('customTitle').value = '';
+            document.getElementById('customDesc').value = '';
+            render();
         }
 
         function openPlaylistModal() {
@@ -488,17 +652,9 @@
         function openVideoModal() {
             toggleFab();
             const select = document.getElementById('playlistSelect');
-            select.innerHTML = '';
-            
-            const customPlaylists = playlistsData.filter(pl => pl.id !== 'all');
-            
-            if (customPlaylists.length === 0) {
-                alert('පළමුවෙන් "+ Add Playlist" ක්ලික් කර Playlist එකක් සාදාගන්න!');
-                openPlaylistModal();
-                return;
-            }
+            select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
 
-            customPlaylists.forEach(pl => {
+            playlistsData.forEach(pl => {
                 select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`;
             });
 
@@ -510,15 +666,13 @@
             document.getElementById('videoModal').style.display = 'none';
         }
 
-        function saveAndRefresh() {
-            localStorage.setItem('vissaPlaylists', JSON.stringify(playlistsData));
-            renderTabs();
-            renderVideos();
+        function saveData() {
+            localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
+            localStorage.setItem('vissaPlaylistsData', JSON.stringify(playlistsData));
         }
 
-        // Initial Executions
-        renderTabs();
-        renderVideos();
+        // Initial Load
+        render();
     </script>
 </body>
 </html>
