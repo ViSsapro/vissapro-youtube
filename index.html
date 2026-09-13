@@ -29,9 +29,9 @@
             min-height: 100vh;
         }
 
-        /* Navigation Menu */
+        /* Navigation Menu - Fixed & Clear Buttons */
         .navbar {
-            background-color: rgba(30, 41, 59, 0.8);
+            background-color: rgba(30, 41, 59, 0.95);
             backdrop-filter: blur(12px);
             padding: 1rem 2rem;
             display: flex;
@@ -44,33 +44,35 @@
         }
 
         .navbar-brand {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 800;
             background: linear-gradient(135deg, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-right: 20px;
+            margin-right: 25px;
+            cursor: pointer;
         }
 
         .nav-link {
             color: var(--text-muted);
             text-decoration: none;
             font-weight: 600;
-            padding: 10px 18px;
+            padding: 10px 20px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
+            user-select: none;
         }
 
         .nav-link:hover {
             color: var(--text-main);
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
         .nav-link.active {
-            color: #fff;
-            background: var(--primary);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            color: #fff !important;
+            background: var(--primary) !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
         }
 
         .admin-toggle-btn {
@@ -100,7 +102,7 @@
 
         .page {
             display: none;
-            animation: fadeIn 0.4s ease-in-out;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .page.active {
@@ -108,7 +110,7 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -274,7 +276,7 @@
             margin-top: 10px;
         }
 
-        /* Form Modal / Section */
+        /* Form Section */
         .withdrawal-form-container {
             display: none;
             margin-top: 30px;
@@ -303,11 +305,6 @@
             font-size: 15px;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary);
         }
 
         .submit-btn {
@@ -321,12 +318,6 @@
             cursor: pointer;
             width: 100%;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            transition: all 0.2s;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
         }
 
         .submit-btn:disabled {
@@ -341,16 +332,16 @@
 
     <!-- Menu Bar Navigation -->
     <div class="navbar">
-        <div class="navbar-brand">EARN HUB</div>
-        <a class="nav-link active" id="nav-home">Home (Earn)</a>
-        <a class="nav-link" id="nav-payment">Payment Details</a>
-        <button class="admin-toggle-btn" onclick="toggleAdminMode()">Admin Mode: <span id="admin-status">OFF</span></button>
+        <div class="navbar-brand" onclick="switchTab('home')">EARN HUB</div>
+        <div class="nav-link" id="nav-home" onclick="switchTab('home')">Home (Earn)</div>
+        <div class="nav-link active" id="nav-payment" onclick="switchTab('payment')">Payment Details</div>
+        <button class="admin-toggle-btn" onclick="toggleAdminMode()">Admin Mode: <span id="admin-status">ON</span></button>
     </div>
 
     <div class="container">
         
         <!-- PAGE 1: HOME (AD BUTTONS) -->
-        <div id="home-page" class="page active">
+        <div id="home-page" class="page">
             <div class="card">
                 <h2 style="margin-top: 0;">Earn Money</h2>
                 <p style="color: var(--text-muted);">Click the buttons below to open ads and add rewards to your balance:</p>
@@ -373,21 +364,21 @@
         </div>
 
         <!-- PAGE 2: PAYMENT DETAILS -->
-        <div id="payment-page" class="page">
+        <div id="payment-page" class="page active">
             
             <!-- Overall Balance & $100 Progress -->
             <div class="card balance-header">
                 <h2>Your Total Balance</h2>
-                <div class="balance-amount">$<span id="user-balance">0.00</span></div>
+                <div class="balance-amount">$<span id="user-balance">3.50</span></div>
 
                 <!-- $100 Goal Progress -->
                 <div class="progress-container">
                     <div class="progress-label">
                         <span>Overall Goal Progress ($100 Target)</span>
-                        <span id="overall-percentage">0%</span>
+                        <span id="overall-percentage">3.5%</span>
                     </div>
                     <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" id="overall-bar"></div>
+                        <div class="progress-bar-fill" id="overall-bar" style="width: 3.5%;"></div>
                     </div>
                 </div>
             </div>
@@ -433,20 +424,17 @@
 
             </div>
 
-            <!-- Withdrawal Form Section (With Formspree integration) -->
+            <!-- Withdrawal Form Section -->
             <div class="card withdrawal-form-container" id="form-container">
                 <h3 id="form-title" style="margin-top:0; margin-bottom: 20px;">Withdrawal Request</h3>
                 
                 <form id="withdrawal-form" action="https://formspree.io/f/xoeqowjq" method="POST">
-                    
                     <input type="hidden" name="Payment Method" id="input-method">
                     <input type="hidden" name="User Balance" id="input-balance">
 
-                    <div id="dynamic-fields">
-                        <!-- Fields populated based on PayPal, Binance or Bank selection -->
-                    </div>
+                    <div id="dynamic-fields"></div>
 
-                    <button type="submit" class="submit-btn" id="withdraw-btn">Request Money</button>
+                    <button type="submit" class="submit-btn" id="withdraw-btn">Withdraw Money</button>
                 </form>
             </div>
 
@@ -455,10 +443,9 @@
     </div>
 
     <script>
-        // Mock User State
         let currentUser = {
-            balance: 3.50, // පාරිභෝගිකයාගේ වත්මන් මුදල (USD වලින්)
-            isAdmin: false
+            balance: 3.50,
+            isAdmin: true
         };
 
         const limits = {
@@ -468,26 +455,26 @@
             bank: 5.50
         };
 
-        // Tab Switch Management
-        const navHome = document.getElementById('nav-home');
-        const navPayment = document.getElementById('nav-payment');
-        const homePage = document.getElementById('home-page');
-        const paymentPage = document.getElementById('payment-page');
+        // Tab Switching Function
+        function switchTab(tabName) {
+            const navHome = document.getElementById('nav-home');
+            const navPayment = document.getElementById('nav-payment');
+            const homePage = document.getElementById('home-page');
+            const paymentPage = document.getElementById('payment-page');
 
-        navHome.addEventListener('click', () => {
-            navHome.classList.add('active');
-            navPayment.classList.remove('active');
-            homePage.classList.add('active');
-            paymentPage.classList.remove('active');
-        });
-
-        navPayment.addEventListener('click', () => {
-            navPayment.classList.add('active');
-            navHome.classList.remove('active');
-            paymentPage.classList.add('active');
-            homePage.classList.remove('active');
-            updateUI();
-        });
+            if (tabName === 'home') {
+                navHome.classList.add('active');
+                navPayment.classList.remove('active');
+                homePage.classList.add('active');
+                paymentPage.classList.remove('active');
+            } else {
+                navPayment.classList.add('active');
+                navHome.classList.remove('active');
+                paymentPage.classList.add('active');
+                homePage.classList.remove('active');
+                updateUI();
+            }
+        }
 
         // Toggle Admin Mode
         function toggleAdminMode() {
@@ -500,12 +487,10 @@
         function updateUI() {
             document.getElementById('user-balance').innerText = currentUser.balance.toFixed(2);
 
-            // Overall $100 Goal Fill
             let overallPct = Math.min((currentUser.balance / limits.overall) * 100, 100);
             document.getElementById('overall-bar').style.width = overallPct + '%';
             document.getElementById('overall-percentage').innerText = overallPct.toFixed(1) + '%';
 
-            // Individual Methods Status Render
             renderMethodStatus('paypal', limits.paypal);
             renderMethodStatus('binance', limits.binance);
             renderMethodStatus('bank', limits.bank);
@@ -532,7 +517,6 @@
             }
         }
 
-        // Method Selection Logic
         function selectMethod(method) {
             const formContainer = document.getElementById('form-container');
             const dynamicFields = document.getElementById('dynamic-fields');
@@ -573,7 +557,7 @@
                     </div>
                     <div class="form-group">
                         <label>Account Holder Name</label>
-                        <input type="text" name="Account Holder Name" required placeholder="Full Name as in Bank Account">
+                        <input type="text" name="Account Holder Name" required placeholder="Full Name">
                     </div>
                     <div class="form-group">
                         <label>Account Number</label>
@@ -590,11 +574,9 @@
                 withdrawBtn.innerText = "Withdraw Money";
             }
 
-            // Smooth scroll to form
             formContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Initialize UI
         updateUI();
     </script>
 </body>
