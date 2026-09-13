@@ -495,32 +495,103 @@
 
         .btn-watch-ad:hover { transform: scale(1.02); filter: brightness(1.1); }
 
-        /* ------------------ COMMENTS PAGE STYLES ------------------ */
-        .comments-box {
-            background-color: #181818;
-            border: 1px solid #333;
-            border-radius: 16px;
+        /* ------------------ PAYMENT & WITHDRAW STYLES ------------------ */
+        .withdraw-card {
+            background: #222;
             padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #333;
+            margin-top: 15px;
         }
 
-        .comment-input-group { margin-bottom: 25px; }
-        .comment-input-group textarea {
-            width: 100%; height: 90px;
-            background: #111; border: 1px solid #444;
-            border-radius: 8px; color: #fff; padding: 12px;
-            font-size: 0.95rem; margin-bottom: 10px;
+        .withdraw-card input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #111;
+            color: #fff;
+            font-size: 0.95rem;
         }
 
-        .comment-item {
+        .balance-badge-box {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: #000;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Target Timeline / Progress Bar for Selected Method */
+        .timeline-box {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 14px;
             background-color: #222;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 3px solid #ff0000;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #444;
         }
 
-        .comment-author { font-size: 0.85rem; color: #ff0000; font-weight: bold; margin-bottom: 4px; }
-        .comment-text { font-size: 0.95rem; color: #ddd; }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0000, #38ef7d);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Method Selection Tabs (Binance, Bank, Paypal) */
+        .method-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .method-btn {
+            background-color: #111;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .method-btn i { font-size: 1.3rem; }
+        .method-btn.active {
+            border-color: #38ef7d;
+            background-color: #2a2a2a;
+            color: #38ef7d;
+        }
+
+        .method-form { display: none; }
+        .method-form.active { display: block; }
 
         /* Floating (+) Admin Button */
         .fab-container {
@@ -554,36 +625,6 @@
             font-weight: 600; white-space: nowrap;
         }
         .fab-option-btn i { color: #ff0000; }
-
-        /* Payment Details & Withdraw Portal Styles */
-        .withdraw-card {
-            background: #222;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            margin-top: 15px;
-        }
-
-        .withdraw-card input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background-color: #111;
-            color: #fff;
-            font-size: 0.95rem;
-        }
-
-        .balance-badge-box {
-            background: linear-gradient(45deg, #11998e, #38ef7d);
-            color: #000;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
@@ -611,7 +652,7 @@
         </div>
     </div>
 
-    <!-- Modal 1: Email Request & OTP Verification -->
+    <!-- Modal: Email Request & OTP Verification -->
     <div class="modal" id="emailAuthModal">
         <div class="modal-content">
             <h3 id="emailModalTitle">Email Sign In</h3>
@@ -640,7 +681,7 @@
     <!-- ================================================================= -->
     <div class="app-wrapper" id="appScreen">
         
-        <!-- Top Navbar with Hamburger Icon -->
+        <!-- Top Navbar -->
         <div class="top-navbar">
             <div class="user-badge">
                 <i class="fa-solid fa-user-circle"></i>
@@ -770,41 +811,91 @@
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL PAGE -->
+        <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL (UPDATED WITH METHOD TIMELINES) -->
         <!-- ============================================================= -->
         <div id="viewPaymentDetails" class="page-view">
             <div class="earn-container">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <i class="fa-solid fa-wallet" style="font-size: 50px; color: #ff0000; margin-bottom: 10px;"></i>
                     <h2>Payment Details & Withdraw Portal</h2>
-                    <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">ඔබ එකතු කරගත් ඩොලර් මුදල් Withdraw කිරීමට පහත තොරතුරු සම්පූර්ණ කරන්න.</p>
+                    <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">තෝරාගත් Method එකේ Target Limit එක සම්පූර්ණ වූ පසු Withdraw Request එක යොමු කරන්න.</p>
                 </div>
 
+                <!-- Total Balance Box -->
                 <div class="balance-badge-box">
-                    <span style="font-size: 0.9rem;">Current Unlocked Balance:</span>
-                    <h1 id="withdrawDisplayBalance" style="font-size: 2.2rem; margin-top: 5px;">$0.00000</h1>
+                    <span style="font-size: 0.9rem;">Total Balance:</span>
+                    <h1 id="withdrawDisplayBalance" style="font-size: 2.3rem; margin-top: 5px;">$0.00000</h1>
+                    
+                    <!-- Dynamic Target Timeline according to selected Payment Method -->
+                    <div class="timeline-box">
+                        <div class="timeline-header">
+                            <span id="timelineTitleText">PayPal Goal Progress ($3.00 Target)</span>
+                            <span id="timelinePercent">0.00%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="timelineBarFill"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; margin-top: 6px;">
+                            <span>$0.00</span>
+                            <span id="remainingText">Remaining: $3.00</span>
+                            <span id="timelineMaxText">$3.00</span>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- Withdraw Form with 3 Method Boxes -->
                 <div class="withdraw-card">
-                    <h3 style="margin-bottom: 15px; color: #ff0000;"><i class="fa-solid fa-building-columns"></i> Enter Your Bank Details</h3>
+                    <h3 style="margin-bottom: 15px; text-align: center;">Select Payment Method</h3>
                     
-                    <label style="color: #aaa; font-size: 0.85rem;">Bank Name:</label>
-                    <input type="text" id="wBankName" placeholder="e.g. Commercial Bank / Bank of Ceylon">
+                    <!-- Method Selector Tabs -->
+                    <div class="method-tabs">
+                        <button class="method-btn active" id="btnMethodPaypal" onclick="selectPaymentMethod('paypal')">
+                            <i class="fa-brands fa-paypal" style="color:#003087;"></i> PayPal
+                            <span style="font-size:0.7rem; color:#888;">Limit: $3.00</span>
+                        </button>
+                        <button class="method-btn" id="btnMethodBinance" onclick="selectPaymentMethod('binance')">
+                            <i class="fa-solid fa-cubes" style="color:#f3ba2f;"></i> Binance
+                            <span style="font-size:0.7rem; color:#888;">Limit: $4.50</span>
+                        </button>
+                        <button class="method-btn" id="btnMethodBank" onclick="selectPaymentMethod('bank')">
+                            <i class="fa-solid fa-building-columns" style="color:#ff0000;"></i> Bank
+                            <span style="font-size:0.7rem; color:#888;">Limit: $6.50</span>
+                        </button>
+                    </div>
 
-                    <label style="color: #aaa; font-size: 0.85rem;">Account Number:</label>
-                    <input type="text" id="wAccNumber" placeholder="e.g. 8010459201">
+                    <!-- PayPal Form -->
+                    <div id="formPaypal" class="method-form active">
+                        <label style="color: #aaa; font-size: 0.85rem;">PayPal Email Address:</label>
+                        <input type="email" id="wPaypalEmail" placeholder="e.g. yourname@paypal.com">
+                    </div>
 
-                    <label style="color: #aaa; font-size: 0.85rem;">Branch Name:</label>
-                    <input type="text" id="wBranch" placeholder="e.g. Colombo Fort">
+                    <!-- Binance Form -->
+                    <div id="formBinance" class="method-form">
+                        <label style="color: #aaa; font-size: 0.85rem;">Binance Pay ID or USDT (BEP20) Address:</label>
+                        <input type="text" id="wBinanceId" placeholder="e.g. 254896321 / 0x123...">
+                    </div>
 
-                    <label style="color: #aaa; font-size: 0.85rem;">Account Holder Name:</label>
-                    <input type="text" id="wAccName" placeholder="e.g. A.B.C. Perera">
+                    <!-- Bank Form -->
+                    <div id="formBank" class="method-form">
+                        <label style="color: #aaa; font-size: 0.85rem;">Bank Name:</label>
+                        <input type="text" id="wBankName" placeholder="e.g. Commercial Bank">
 
-                    <label style="color: #aaa; font-size: 0.85rem;">Withdraw Amount ($):</label>
+                        <label style="color: #aaa; font-size: 0.85rem;">Account Number:</label>
+                        <input type="text" id="wAccNumber" placeholder="e.g. 8010459201">
+
+                        <label style="color: #aaa; font-size: 0.85rem;">Branch Name:</label>
+                        <input type="text" id="wBranch" placeholder="e.g. Colombo Fort">
+
+                        <label style="color: #aaa; font-size: 0.85rem;">Account Holder Name:</label>
+                        <input type="text" id="wAccName" placeholder="e.g. A.B.C. Perera">
+                    </div>
+
+                    <!-- Common Withdraw Amount Field -->
+                    <label style="color: #aaa; font-size: 0.85rem; margin-top: 5px; display: block;">Withdraw Amount ($):</label>
                     <input type="number" step="0.00010" id="wAmount" placeholder="0.00010">
 
                     <button class="btn-submit" style="width: 100%; padding: 14px; margin-top: 10px; font-size: 1rem;" onclick="requestWithdrawal()">
-                        <i class="fa-solid fa-paper-plane"></i> Request Withdraw
+                        <i class="fa-solid fa-paper-plane"></i> Submit Request
                     </button>
                 </div>
             </div>
@@ -814,18 +905,18 @@
         <!-- VIEW 4: YOUR COMMENTS PAGE -->
         <!-- ============================================================= -->
         <div id="viewComments" class="page-view">
-            <div class="comments-box">
+            <div class="earn-container">
                 <h2 style="margin-bottom: 15px;"><i class="fa-solid fa-comments" style="color:#ff0000;"></i> Your Comments & Feedback</h2>
                 
                 <div class="comment-input-group">
-                    <textarea id="newCommentText" placeholder="ඔබගේ අදහස් හෝ ගැටලු මෙතැන සටහන් කරන්න..."></textarea>
+                    <textarea id="newCommentText" placeholder="ඔබගේ අදහස් හෝ ගැටලු මෙතැන සටහන් කරන්න..." style="width:100%; height:90px; background:#111; border:1px solid #444; border-radius:8px; color:#fff; padding:12px; font-size:0.95rem; margin-bottom:10px;"></textarea>
                     <button class="btn-submit" onclick="postComment()">Post Comment</button>
                 </div>
 
-                <div id="commentsList">
-                    <div class="comment-item">
-                        <div class="comment-author">Vimukthi Thuhina (Admin)</div>
-                        <div class="comment-text">සාදරයෙන් පිළිගන්නවා VissaPro E-Money චැනල් එකට! ඕනෑම ගැටලුවක් මෙතනින් අහන්න.</div>
+                <div id="commentsList" style="margin-top:20px;">
+                    <div style="background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;">
+                        <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">Vimukthi Thuhina (Admin)</div>
+                        <div style="font-size:0.95rem; color:#ddd;">සාදරයෙන් පිළිගන්නවා VissaPro E-Money චැනල් එකට! ඕනෑම ගැටලුවක් මෙතනින් අහන්න.</div>
                     </div>
                 </div>
             </div>
@@ -860,7 +951,7 @@
         </div>
     </div>
 
-    <!-- Modals for Video & Playlist Addition -->
+    <!-- Modals for Admin -->
     <div class="modal" id="playlistModal">
         <div class="modal-content">
             <h3>නව Playlist එකක් සාදන්න</h3>
@@ -875,14 +966,12 @@
     <div class="modal" id="videoModal">
         <div class="modal-content">
             <h3>නව Video එකක් එකතු කරන්න</h3>
-            <label style="color:#aaa; font-size:0.85rem; margin-bottom:5px; display:block;">Playlist එකක් තෝරන්න (අවශ්‍ය නම් පමණක්):</label>
             <select id="playlistSelect" style="width:100%; padding:12px; margin-bottom:15px; border-radius:6px; background:#111; color:#fff; border:1px solid #444;">
                 <option value="none">-- None (Single Video / Direct Upload) --</option>
             </select>
-
             <input type="text" id="ytLinkInput" placeholder="YouTube Link (e.g., https://youtu.be/xxx)">
-            <input type="text" id="customTitle" placeholder="Title (Auto-fetch නොවුවහොත් පමණක් ලියන්න)">
-            <input type="text" id="customDesc" placeholder="Description (Auto-fetch නොවුවහොත් පමණක් ලියන්න)">
+            <input type="text" id="customTitle" placeholder="Title (Optional)">
+            <input type="text" id="customDesc" placeholder="Description (Optional)">
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeAdminModals()">Cancel</button>
                 <button class="btn-submit" onclick="addVideo()">Add Video</button>
@@ -890,12 +979,9 @@
         </div>
     </div>
 
-    <!-- ================================================================= -->
     <!-- FIREBASE MODULE & JAVASCRIPT LOGIC -->
-    <!-- ================================================================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -904,48 +990,46 @@
             projectId: "vissapro-aa91d",
             storageBucket: "vissapro-aa91d.firebasestorage.app",
             messagingSenderId: "866553327331",
-            appId: "1:866553327331:web:60ef47fa0c88a942571fd6",
-            measurementId: "G-VBNN5652DD"
+            appId: "1:866553327331:web:60ef47fa0c88a942571fd6"
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
 
         window.triggerGoogleLogin = function() {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-                .then((result) => {
-                    const email = result.user.email;
-                    window.loginSuccess(email);
-                })
-                .catch((error) => { alert("Google Sign-In Error: " + error.message); });
+                .then((res) => { window.loginSuccess(res.user.email); })
+                .catch((err) => { alert("Google Sign-In Error: " + err.message); });
         };
 
         window.triggerFacebookLogin = function() {
             const provider = new FacebookAuthProvider();
             signInWithPopup(auth, provider)
-                .then((result) => {
-                    const email = result.user.email || "facebook_user@vissapro.com";
-                    window.loginSuccess(email);
-                })
-                .catch((error) => { alert("Facebook Sign-In Error: " + error.message); });
+                .then((res) => { window.loginSuccess(res.user.email || "facebook_user@vissapro.com"); })
+                .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
         };
     </script>
 
     <script>
         // EmailJS Init
-        (function(){
-            emailjs.init("PjusIs1VJ5zFRcuZp");
-        })();
+        (function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
 
         const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU";
         const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
         const ADSTERRA_SHORTLINK = "https://www.profitableratecpmnetwork.com/vjqz55vz70?key=9d1607f0aa27ecbba8680e15d9d0ec4a";
 
+        // Payment Method Minimum Thresholds
+        const LIMITS = {
+            paypal: 3.00,
+            binance: 4.50,
+            bank: 6.50
+        };
+
         let generatedOTP = null;
         let pendingEmail = "";
         let userBalance = 0.00000;
+        let selectedPaymentMethod = 'paypal';
 
         // App Data
         let singleVideos = JSON.parse(localStorage.getItem('vissaSingleVideos')) || [];
@@ -955,78 +1039,124 @@
 
         window.onload = function() {
             const loggedUser = localStorage.getItem('vissaLoggedUser');
-            if (loggedUser) {
-                initDashboard(loggedUser);
-            }
+            if (loggedUser) { initDashboard(loggedUser); }
         };
 
-        /* Drawer & Page View Navigation */
         function toggleSideMenu() {
             const drawer = document.getElementById('sideDrawer');
             const overlay = document.getElementById('menuOverlay');
-            if (drawer.classList.contains('open')) {
-                drawer.classList.remove('open');
-                overlay.style.display = 'none';
-            } else {
-                drawer.classList.add('open');
-                overlay.style.display = 'block';
-            }
+            drawer.classList.toggle('open');
+            overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
         }
 
         function switchPageView(page) {
-            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active-view'));
-            document.querySelectorAll('.drawer-nav-item button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.drawer-nav-item button').forEach(b => b.classList.remove('active'));
 
-            if (page === 'home') {
-                document.getElementById('viewHome').classList.add('active-view');
-                document.getElementById('navHome').classList.add('active');
-            } else if (page === 'makemoney') {
-                document.getElementById('viewMakeMoney').classList.add('active-view');
-                document.getElementById('navMakeMoney').classList.add('active');
-            } else if (page === 'paymentDetails') {
-                document.getElementById('viewPaymentDetails').classList.add('active-view');
-                document.getElementById('navPaymentDetails').classList.add('active');
-            } else if (page === 'comments') {
-                document.getElementById('viewComments').classList.add('active-view');
-                document.getElementById('navComments').classList.add('active');
-            } else if (page === 'account') {
-                document.getElementById('viewAccount').classList.add('active-view');
-                document.getElementById('navAccount').classList.add('active');
-            }
-
+            const targetMap = {
+                'home': 'viewHome',
+                'makemoney': 'viewMakeMoney',
+                'paymentDetails': 'viewPaymentDetails',
+                'comments': 'viewComments',
+                'account': 'viewAccount'
+            };
+            
+            document.getElementById(targetMap[page]).classList.add('active-view');
+            document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
             toggleSideMenu();
         }
 
-        /* Make Money - Ad Handler with Shortlink & $0.00010 Addition */
-        function watchAdAction(adTitle) {
-            // Open Shortlink in a new tab
-            window.open(ADSTERRA_SHORTLINK, '_blank');
+        /* Update Balance and Dynamic Method Timeline Bar */
+        function updateBalanceDisplay() {
+            const formatted = '$' + userBalance.toFixed(5);
+            document.getElementById('accBalance').innerText = formatted;
+            document.getElementById('withdrawDisplayBalance').innerText = formatted;
 
-            // Add $0.00010 to balance
-            userBalance += 0.00010;
+            // Method Specific Limit calculation
+            const currentLimit = LIMITS[selectedPaymentMethod];
+            const methodNameCap = selectedPaymentMethod.charAt(0).toUpperCase() + selectedPaymentMethod.slice(1);
             
-            // Update Balance Displays
-            document.getElementById('accBalance').innerText = '$' + userBalance.toFixed(5);
-            document.getElementById('withdrawDisplayBalance').innerText = '$' + userBalance.toFixed(5);
+            document.getElementById('timelineTitleText').innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
+            document.getElementById('timelineMaxText').innerText = `$${currentLimit.toFixed(2)}`;
 
+            const percent = Math.min((userBalance / currentLimit) * 100, 100).toFixed(2);
+            document.getElementById('timelinePercent').innerText = percent + '%';
+            document.getElementById('timelineBarFill').style.width = percent + '%';
+
+            const remaining = Math.max(0, currentLimit - userBalance).toFixed(5);
+            document.getElementById('remainingText').innerText = `Remaining: $${remaining}`;
+        }
+
+        /* Make Money - Ad Handler */
+        function watchAdAction(adTitle) {
+            window.open(ADSTERRA_SHORTLINK, '_blank');
+            userBalance += 0.00010;
+            updateBalanceDisplay();
             alert(`"${adTitle}" සක්‍රිය විය! $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
         }
 
-        /* Payment Details / Withdrawal Request Handler */
+        /* Payment Method Tabs Handler */
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.method-form').forEach(f => f.classList.remove('active'));
+
+            if (method === 'paypal') {
+                document.getElementById('btnMethodPaypal').classList.add('active');
+                document.getElementById('formPaypal').classList.add('active');
+            } else if (method === 'binance') {
+                document.getElementById('btnMethodBinance').classList.add('active');
+                document.getElementById('formBinance').classList.add('active');
+            } else if (method === 'bank') {
+                document.getElementById('btnMethodBank').classList.add('active');
+                document.getElementById('formBank').classList.add('active');
+            }
+
+            // Update Timeline view according to chosen method
+            updateBalanceDisplay();
+        }
+
+        /* Withdrawal Request Handler with Limit Check */
         function requestWithdrawal() {
             const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
-            const bankName = document.getElementById('wBankName').value.trim();
-            const accNumber = document.getElementById('wAccNumber').value.trim();
-            const branch = document.getElementById('wBranch').value.trim();
-            const accName = document.getElementById('wAccName').value.trim();
             const amount = document.getElementById('wAmount').value.trim();
+            const minLimit = LIMITS[selectedPaymentMethod];
+            let detailsText = "";
 
-            if (!bankName || !accNumber || !branch || !accName || !amount) {
-                alert('කරුණාකර සියලුම බැංකු තොරතුරු සහ Withdraw කිරීමට අවශ්‍ය ඩොලර් ගණන ඇතුළත් කරන්න!');
+            if (userBalance < minLimit) {
+                const rem = (minLimit - userBalance).toFixed(5);
+                alert(`Withdraw කිරීමට නොහැක!\n\n${selectedPaymentMethod.toUpperCase()} සඳහා අවම Withdrawal limit එක $${minLimit.toFixed(2)} කි.\nඔබට තව $${rem} ක් ලබා ගැනීමට අවශ්‍යයි.`);
                 return;
             }
 
-            const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nBank Details:\nBank: ${bankName}\nAcc No: ${accNumber}\nBranch: ${branch}\nName: ${accName}`;
+            if (!amount || parseFloat(amount) <= 0) {
+                alert('කරුණාකර Withdraw කිරීමට අවශ්‍ය ඩොලර් ගණන ඇතුළත් කරන්න!');
+                return;
+            }
+
+            if (parseFloat(amount) > userBalance) {
+                alert('ඔබගේ Total Balance එකට වඩා වැඩි මුදලක් Withdraw කිරීමට නොහැක!');
+                return;
+            }
+
+            if (selectedPaymentMethod === 'paypal') {
+                const ppEmail = document.getElementById('wPaypalEmail').value.trim();
+                if (!ppEmail) { alert('කරුණාකර PayPal Email එක ඇතුළත් කරන්න!'); return; }
+                detailsText = `Method: PayPal\nPayPal Email: ${ppEmail}`;
+            } else if (selectedPaymentMethod === 'binance') {
+                const bId = document.getElementById('wBinanceId').value.trim();
+                if (!bId) { alert('කරුණාකර Binance Pay ID හෝ Address එක ඇතුළත් කරන්න!'); return; }
+                detailsText = `Method: Binance\nBinance Pay ID/Address: ${bId}`;
+            } else if (selectedPaymentMethod === 'bank') {
+                const bank = document.getElementById('wBankName').value.trim();
+                const acc = document.getElementById('wAccNumber').value.trim();
+                const branch = document.getElementById('wBranch').value.trim();
+                const name = document.getElementById('wAccName').value.trim();
+                if (!bank || !acc || !branch || !name) { alert('කරුණාකර සියලුම බැංකු තොරතුරු ඇතුළත් කරන්න!'); return; }
+                detailsText = `Method: Bank Transfer\nBank: ${bank}\nAcc No: ${acc}\nBranch: ${branch}\nName: ${name}`;
+            }
+
+            const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nCurrent User Total Balance: $${userBalance.toFixed(5)}\nRequired Threshold Passed: $${minLimit.toFixed(2)}\n\n--- Withdrawal Details ---\n${detailsText}`;
 
             const templateParams = {
                 email: MY_ADMIN_GMAIL,
@@ -1036,13 +1166,11 @@
             emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
                 .then(function() {
                     alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
-                    document.getElementById('wBankName').value = '';
-                    document.getElementById('wAccNumber').value = '';
-                    document.getElementById('wBranch').value = '';
-                    document.getElementById('wAccName').value = '';
+                    userBalance -= parseFloat(amount);
+                    updateBalanceDisplay();
                     document.getElementById('wAmount').value = '';
                 }, function(error) {
-                    alert('Withdrawal Request එක යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
+                    alert('යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
                 });
         }
 
@@ -1055,58 +1183,39 @@
 
             const list = document.getElementById('commentsList');
             const newComment = document.createElement('div');
-            newComment.className = 'comment-item';
+            newComment.style = "background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;";
             newComment.innerHTML = `
-                <div class="comment-author">${loggedUser}</div>
-                <div class="comment-text">${text}</div>
+                <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">${loggedUser}</div>
+                <div style="font-size:0.95rem; color:#ddd;">${text}</div>
             `;
             list.prepend(newComment);
             document.getElementById('newCommentText').value = '';
         }
 
-        /* Email OTP Handlers */
-        function openEmailModal() {
-            document.getElementById('emailAuthModal').style.display = 'flex';
-            document.getElementById('otpStep1').style.display = 'block';
-            document.getElementById('otpStep2').style.display = 'none';
-        }
-
-        function closeAuthModal() {
-            document.getElementById('emailAuthModal').style.display = 'none';
-        }
+        /* Email Authentication Functions */
+        function openEmailModal() { document.getElementById('emailAuthModal').style.display = 'flex'; }
+        function closeAuthModal() { document.getElementById('emailAuthModal').style.display = 'none'; }
 
         function sendOTPCode() {
             const userEmail = document.getElementById('userEmailInput').value.trim();
-            if (!userEmail || !userEmail.includes('@')) {
-                alert('කරුණාකර නිවැරදි Email ලිපිනයක් ඇතුළත් කරන්න!');
-                return;
-            }
+            if (!userEmail || !userEmail.includes('@')) { alert('කරුණාකර නිවැරදි Email එකක් ඇතුළත් කරන්න!'); return; }
 
             pendingEmail = userEmail;
             generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
 
-            const templateParams = { email: userEmail, passcode: generatedOTP };
-
-            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
+            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: userEmail, passcode: generatedOTP })
                 .then(function() {
-                    alert(`Verification Code එක ${userEmail} වෙත යවන ලදී. Inbox/Spam පරීක්ෂා කරන්න.`);
+                    alert(`Verification Code එක ${userEmail} වෙත යවන ලදී.`);
                     document.getElementById('otpStep1').style.display = 'none';
                     document.getElementById('otpStep2').style.display = 'block';
-                    document.getElementById('emailModalDesc').innerText = `${userEmail} වෙත යවන ලද 6-digit කෝඩ් එක ඇතුළත් කරන්න.`;
-                }, function(error) {
-                    alert('Email යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
-                });
+                }, function(err) { alert('දෝෂයක් සිදු විය: ' + JSON.stringify(err)); });
         }
 
         function verifyOTPCode() {
-            const userEnteredOTP = document.getElementById('otpInput').value.trim();
-            if (userEnteredOTP === generatedOTP) {
-                alert('Email Verification සාර්ථකයි!');
+            if (document.getElementById('otpInput').value.trim() === generatedOTP) {
                 closeAuthModal();
                 loginSuccess(pendingEmail);
-            } else {
-                alert('වැරදි Verification Code එකකි. නැවත උත්සාහ කරන්න.');
-            }
+            } else { alert('වැරදි Verification Code එකකි!'); }
         }
 
         function loginSuccess(email) {
@@ -1133,6 +1242,7 @@
                 fabElem.style.display = "none";
             }
 
+            updateBalanceDisplay();
             render();
         }
 
@@ -1142,7 +1252,7 @@
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
-        /* Admin / Video Rendering Functions */
+        /* Video System Logic */
         function toggleFab() { document.getElementById('fabContainer').classList.toggle('active'); }
 
         function switchMainView(view) {
@@ -1162,13 +1272,11 @@
             if (currentView === 'videos') {
                 let allCombined = [...singleVideos];
                 playlistsData.forEach(pl => { allCombined = allCombined.concat(pl.videos); });
-
                 if (allCombined.length === 0) {
                     container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් වීඩියෝ නොමැත.</p>';
                     return;
                 }
                 renderVideoCards(allCombined, container);
-
             } else if (currentView === 'playlists') {
                 if (selectedPlaylistId === null) {
                     if (playlistsData.length === 0) {
@@ -1181,11 +1289,7 @@
                         const card = document.createElement('div');
                         card.className = 'playlist-card';
                         card.onclick = () => { selectedPlaylistId = pl.id; render(); };
-                        card.innerHTML = `
-                            <i class="fa-solid fa-layer-group"></i>
-                            <h3>${pl.name}</h3>
-                            <span style="color:#777; font-size:0.85rem;">${pl.videos.length} Videos</span>
-                        `;
+                        card.innerHTML = `<i class="fa-solid fa-layer-group"></i><h3>${pl.name}</h3><span style="color:#777; font-size:0.85rem;">${pl.videos.length} Videos</span>`;
                         grid.appendChild(card);
                     });
                     container.appendChild(grid);
@@ -1193,26 +1297,14 @@
                     subTabs.style.display = 'flex';
                     renderSubTabs();
                     const currentPl = playlistsData.find(pl => pl.id === selectedPlaylistId);
-                    if (currentPl) {
-                        if (currentPl.videos.length === 0) {
-                            container.innerHTML = `<p style="color:#888; text-align:center; padding:40px;">"${currentPl.name}" එකේ තවමත් වීඩියෝ නොමැත.</p>`;
-                        } else {
-                            renderVideoCards(currentPl.videos, container);
-                        }
-                    }
+                    if (currentPl) renderVideoCards(currentPl.videos, container);
                 }
             }
         }
 
         function renderSubTabs() {
             const subTabs = document.getElementById('playlistSubTabs');
-            subTabs.innerHTML = '';
-            const backBtn = document.createElement('button');
-            backBtn.className = 'sub-tab-btn';
-            backBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> සියලුම Playlists';
-            backBtn.onclick = () => { selectedPlaylistId = null; render(); };
-            subTabs.appendChild(backBtn);
-
+            subTabs.innerHTML = '<button class="sub-tab-btn" onclick="selectedPlaylistId=null;render();"><i class="fa-solid fa-arrow-left"></i> All Playlists</button>';
             playlistsData.forEach(pl => {
                 const btn = document.createElement('button');
                 btn.className = `sub-tab-btn ${pl.id === selectedPlaylistId ? 'active' : ''}`;
@@ -1227,15 +1319,11 @@
                 const card = document.createElement('div');
                 card.className = 'video-container';
                 card.innerHTML = `
-                    <div class="video-wrapper">
-                        <iframe src="https://www.youtube.com/embed/${vid.id}" allowfullscreen></iframe>
-                    </div>
+                    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${vid.id}" allowfullscreen></iframe></div>
                     <div class="video-details">
                         <h2 class="video-title">${vid.title}</h2>
                         <div class="video-description">${vid.description}</div>
-                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="yt-btn">
-                            <i class="fa-brands fa-youtube"></i> Watch on YouTube
-                        </a>
+                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="yt-btn"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
                     </div>
                 `;
                 targetElem.appendChild(card);
@@ -1244,76 +1332,38 @@
 
         function addPlaylist() {
             const name = document.getElementById('playlistNameInput').value.trim();
-            if (!name) { alert('කරුණාකර Playlist එක සඳහා නමක් ඇතුළත් කරන්න!'); return; }
-            const newId = 'pl_' + Date.now();
-            playlistsData.push({ id: newId, name: name, videos: [] });
-            saveData();
-            closeAdminModals();
+            if (!name) return;
+            playlistsData.push({ id: 'pl_' + Date.now(), name: name, videos: [] });
+            saveData(); closeAdminModals();
             document.getElementById('playlistNameInput').value = '';
             switchMainView('playlists');
         }
 
         function extractVideoID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
+            const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
             return (match && match[2].length === 11) ? match[2] : url;
-        }
-
-        async function fetchVideoDetails(videoId) {
-            if (!YOUTUBE_API_KEY) return null;
-            try {
-                const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YOUTUBE_API_KEY}`);
-                const data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    return {
-                        title: data.items[0].snippet.title,
-                        description: data.items[0].snippet.description.substring(0, 300) + '...'
-                    };
-                }
-            } catch (err) { console.error('API Fetch Error:', err); }
-            return null;
         }
 
         async function addVideo() {
             const targetPlId = document.getElementById('playlistSelect').value;
             const linkInput = document.getElementById('ytLinkInput').value.trim();
-            let title = document.getElementById('customTitle').value.trim();
-            let description = document.getElementById('customDesc').value.trim();
+            let title = document.getElementById('customTitle').value.trim() || "VissaPro Video";
+            let description = document.getElementById('customDesc').value.trim() || "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
 
-            if (!linkInput) { alert('කරුණාකර YouTube Video Link එකක් ඇතුළත් කරන්න!'); return; }
+            if (!linkInput) return;
             const videoId = extractVideoID(linkInput);
-            const apiData = await fetchVideoDetails(videoId);
-
-            if (apiData) {
-                title = title || apiData.title;
-                description = description || apiData.description;
-            }
-
-            if (!title) title = "VissaPro Video";
-            if (!description) description = "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
-
             const newVidObj = { id: videoId, title: title, description: description };
 
-            if (targetPlId === 'none') {
-                singleVideos.unshift(newVidObj);
-            } else {
+            if (targetPlId === 'none') { singleVideos.unshift(newVidObj); }
+            else {
                 const targetPl = playlistsData.find(pl => pl.id === targetPlId);
                 if (targetPl) targetPl.videos.unshift(newVidObj);
             }
 
-            saveData();
-            closeAdminModals();
-            document.getElementById('ytLinkInput').value = '';
-            document.getElementById('customTitle').value = '';
-            document.getElementById('customDesc').value = '';
-            render();
+            saveData(); closeAdminModals(); render();
         }
 
-        function openPlaylistModal() {
-            toggleFab();
-            document.getElementById('playlistModal').style.display = 'flex';
-        }
-
+        function openPlaylistModal() { toggleFab(); document.getElementById('playlistModal').style.display = 'flex'; }
         function openVideoModal() {
             toggleFab();
             const select = document.getElementById('playlistSelect');
