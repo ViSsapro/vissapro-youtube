@@ -555,16 +555,35 @@
         }
         .fab-option-btn i { color: #ff0000; }
 
-        /* Payment Details Additional Styles */
-        .pay-detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #333;
+        /* Payment Details & Withdraw Portal Styles */
+        .withdraw-card {
+            background: #222;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-top: 15px;
         }
-        .pay-detail-row:last-child { border-bottom: none; }
-        .pay-label { color: #aaa; font-size: 0.95rem; }
-        .pay-val { font-weight: bold; color: #fff; font-size: 0.95rem; }
+
+        .withdraw-card input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #111;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .balance-badge-box {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: #000;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -630,7 +649,6 @@
             </div>
 
             <div class="nav-right-actions">
-                <!-- Three Bars (Hamburger) Button -->
                 <button class="menu-hamburger-btn" onclick="toggleSideMenu()">
                     <i class="fa-solid fa-bars"></i>
                 </button>
@@ -657,7 +675,7 @@
                 </li>
                 <li class="drawer-nav-item">
                     <button id="navPaymentDetails" onclick="switchPageView('paymentDetails')">
-                        <i class="fa-solid fa-credit-card"></i> Payment Details
+                        <i class="fa-solid fa-wallet"></i> Payment Details / Withdraw
                     </button>
                 </li>
                 <li class="drawer-nav-item">
@@ -702,24 +720,24 @@
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 2: MAKE MONEY PAGE (ADS & EARNINGS) -->
+        <!-- VIEW 2: MAKE MONEY PAGE (ADS WITH SHORTLINK & $0.00010 EARNINGS) -->
         <!-- ============================================================= -->
         <div id="viewMakeMoney" class="page-view">
             <div class="earn-container">
                 <div class="earn-banner">
                     <h2><i class="fa-solid fa-coins"></i> Watch Ads & Earn Money</h2>
-                    <p>පහත Ads නැරඹීමෙන් මුදල් සහ Rewards ලබාගන්න!</p>
+                    <p>පහත Ad Buttons ක්ලික් කර නැරඹීමෙන් ඔබගේ Balance එකට $0.00010 බැගින් එකතු කරගන්න!</p>
                 </div>
 
                 <div class="ad-cards-grid">
                     <!-- Ad Item 1 -->
                     <div class="ad-card">
                         <div>
-                            <span class="ad-badge">Reward: $0.10</span>
-                            <div class="ad-title">Trading Basics Sponsored Ad</div>
-                            <div class="ad-desc">තත්පර 30 ක ඇඩ් එක නරඹා ඔබගේ E-Money ගිණුමට ලකුණු එකතු කරගන්න.</div>
+                            <span class="ad-badge">Reward: $0.00010</span>
+                            <div class="ad-title">Adsterra Premium Task 1</div>
+                            <div class="ad-desc">ඇඩ් එක නරඹා $0.00010 ක් ඔබගේ ගිණුමට එකතු කරගන්න.</div>
                         </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Trading Basics Ad')">
+                        <button class="btn-watch-ad" onclick="watchAdAction('Adsterra Task 1')">
                             <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
                         </button>
                     </div>
@@ -727,11 +745,11 @@
                     <!-- Ad Item 2 -->
                     <div class="ad-card">
                         <div>
-                            <span class="ad-badge">Reward: $0.15</span>
-                            <div class="ad-title">Crypto Exchange Special Offer</div>
-                            <div class="ad-desc">Binance Square විශේෂ වීඩියෝ ඇඩ් එක නරඹා Rewards දිනාගන්න.</div>
+                            <span class="ad-badge">Reward: $0.00010</span>
+                            <div class="ad-title">Adsterra Premium Task 2</div>
+                            <div class="ad-desc">විශේෂ ඇඩ් එක නරඹා සාර්ථකව Reward එක Unlock කරන්න.</div>
                         </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Crypto Exchange Ad')">
+                        <button class="btn-watch-ad" onclick="watchAdAction('Adsterra Task 2')">
                             <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
                         </button>
                     </div>
@@ -739,11 +757,11 @@
                     <!-- Ad Item 3 -->
                     <div class="ad-card">
                         <div>
-                            <span class="ad-badge">Reward: $0.05</span>
-                            <div class="ad-title">Micro Tasks & Survey Promo</div>
-                            <div class="ad-desc">ලංකාවේ අයට E-Money හොයන්න පුළුවන් ලෙහෙසිම ක්‍රම ගැන දැනගන්න.</div>
+                            <span class="ad-badge">Reward: $0.00010</span>
+                            <div class="ad-title">Adsterra Premium Task 3</div>
+                            <div class="ad-desc">මෙම ඇඩ් එක ක්ලික් කර $0.00010 ක ගෙවීම් මුදල සක්‍රිය කරගන්න.</div>
                         </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Survey Promo Ad')">
+                        <button class="btn-watch-ad" onclick="watchAdAction('Adsterra Task 3')">
                             <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
                         </button>
                     </div>
@@ -752,33 +770,42 @@
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 3: PAYMENT DETAILS PAGE (NEWLY ADDED) -->
+        <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL PAGE -->
         <!-- ============================================================= -->
         <div id="viewPaymentDetails" class="page-view">
             <div class="earn-container">
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <i class="fa-solid fa-building-columns" style="font-size: 50px; color: #ff0000; margin-bottom: 10px;"></i>
-                    <h2>Official Payment Details</h2>
-                    <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">ගෙවීම් සිදු කිරීම සඳහා පහත ባංකු තොරතුරු භාවිතා කරන්න.</p>
+                    <i class="fa-solid fa-wallet" style="font-size: 50px; color: #ff0000; margin-bottom: 10px;"></i>
+                    <h2>Payment Details & Withdraw Portal</h2>
+                    <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">ඔබ එකතු කරගත් ඩොලර් මුදල් Withdraw කිරීමට පහත තොරතුරු සම්පූර්ණ කරන්න.</p>
                 </div>
 
-                <div style="background: #222; padding: 20px; border-radius: 12px; border: 1px solid #333;">
-                    <div class="pay-detail-row">
-                        <span class="pay-label"><i class="fa-solid fa-university" style="color: #ff0000;"></i> Bank Name:</span>
-                        <span class="pay-val">Commercial Bank</span>
-                    </div>
-                    <div class="pay-detail-row">
-                        <span class="pay-label"><i class="fa-solid fa-hashtag" style="color: #ff0000;"></i> Account Number:</span>
-                        <span class="pay-val">8010459201</span>
-                    </div>
-                    <div class="pay-detail-row">
-                        <span class="pay-label"><i class="fa-solid fa-code-branch" style="color: #ff0000;"></i> Branch:</span>
-                        <span class="pay-val">Colombo Fort</span>
-                    </div>
-                    <div class="pay-detail-row">
-                        <span class="pay-label"><i class="fa-solid fa-user" style="color: #ff0000;"></i> Account Holder:</span>
-                        <span class="pay-val">VissaPro Official</span>
-                    </div>
+                <div class="balance-badge-box">
+                    <span style="font-size: 0.9rem;">Current Unlocked Balance:</span>
+                    <h1 id="withdrawDisplayBalance" style="font-size: 2.2rem; margin-top: 5px;">$0.00000</h1>
+                </div>
+
+                <div class="withdraw-card">
+                    <h3 style="margin-bottom: 15px; color: #ff0000;"><i class="fa-solid fa-building-columns"></i> Enter Your Bank Details</h3>
+                    
+                    <label style="color: #aaa; font-size: 0.85rem;">Bank Name:</label>
+                    <input type="text" id="wBankName" placeholder="e.g. Commercial Bank / Bank of Ceylon">
+
+                    <label style="color: #aaa; font-size: 0.85rem;">Account Number:</label>
+                    <input type="text" id="wAccNumber" placeholder="e.g. 8010459201">
+
+                    <label style="color: #aaa; font-size: 0.85rem;">Branch Name:</label>
+                    <input type="text" id="wBranch" placeholder="e.g. Colombo Fort">
+
+                    <label style="color: #aaa; font-size: 0.85rem;">Account Holder Name:</label>
+                    <input type="text" id="wAccName" placeholder="e.g. A.B.C. Perera">
+
+                    <label style="color: #aaa; font-size: 0.85rem;">Withdraw Amount ($):</label>
+                    <input type="number" step="0.00010" id="wAmount" placeholder="0.00010">
+
+                    <button class="btn-submit" style="width: 100%; padding: 14px; margin-top: 10px; font-size: 1rem;" onclick="requestWithdrawal()">
+                        <i class="fa-solid fa-paper-plane"></i> Request Withdraw
+                    </button>
                 </div>
             </div>
         </div>
@@ -814,7 +841,7 @@
                 <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: left;">
                     <p style="margin-bottom: 10px;"><strong>Logged Email:</strong> <span id="accEmail">user@gmail.com</span></p>
                     <p style="margin-bottom: 10px;"><strong>Account Status:</strong> <span style="color:#38ef7d;">Active</span></p>
-                    <p><strong>Total Earnings:</strong> <span id="accBalance" style="color:#38ef7d; font-weight:bold;">$0.00</span></p>
+                    <p><strong>Total Earnings:</strong> <span id="accBalance" style="color:#38ef7d; font-weight:bold;">$0.00000</span></p>
                 </div>
             </div>
         </div>
@@ -914,10 +941,11 @@
 
         const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU";
         const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
+        const ADSTERRA_SHORTLINK = "https://www.profitableratecpmnetwork.com/vjqz55vz70?key=9d1607f0aa27ecbba8680e15d9d0ec4a";
 
         let generatedOTP = null;
         let pendingEmail = "";
-        let userBalance = 0.00;
+        let userBalance = 0.00000;
 
         // App Data
         let singleVideos = JSON.parse(localStorage.getItem('vissaSingleVideos')) || [];
@@ -946,10 +974,7 @@
         }
 
         function switchPageView(page) {
-            // Hide all pages
             document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active-view'));
-            
-            // Remove active classes from menu buttons
             document.querySelectorAll('.drawer-nav-item button').forEach(btn => btn.classList.remove('active'));
 
             if (page === 'home') {
@@ -969,14 +994,56 @@
                 document.getElementById('navAccount').classList.add('active');
             }
 
-            toggleSideMenu(); // Close menu after selection
+            toggleSideMenu();
         }
 
-        /* Make Money - Ad Handler */
+        /* Make Money - Ad Handler with Shortlink & $0.00010 Addition */
         function watchAdAction(adTitle) {
-            alert(`" ${adTitle} " Ad එක සාර්ථකව නැරඹුවා! $0.10 ක් ඔබගේ Balance එකට එකතු විය.`);
-            userBalance += 0.10;
-            document.getElementById('accBalance').innerText = '$' + userBalance.toFixed(2);
+            // Open Shortlink in a new tab
+            window.open(ADSTERRA_SHORTLINK, '_blank');
+
+            // Add $0.00010 to balance
+            userBalance += 0.00010;
+            
+            // Update Balance Displays
+            document.getElementById('accBalance').innerText = '$' + userBalance.toFixed(5);
+            document.getElementById('withdrawDisplayBalance').innerText = '$' + userBalance.toFixed(5);
+
+            alert(`"${adTitle}" සක්‍රිය විය! $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
+        }
+
+        /* Payment Details / Withdrawal Request Handler */
+        function requestWithdrawal() {
+            const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
+            const bankName = document.getElementById('wBankName').value.trim();
+            const accNumber = document.getElementById('wAccNumber').value.trim();
+            const branch = document.getElementById('wBranch').value.trim();
+            const accName = document.getElementById('wAccName').value.trim();
+            const amount = document.getElementById('wAmount').value.trim();
+
+            if (!bankName || !accNumber || !branch || !accName || !amount) {
+                alert('කරුණාකර සියලුම බැංකු තොරතුරු සහ Withdraw කිරීමට අවශ්‍ය ඩොලර් ගණන ඇතුළත් කරන්න!');
+                return;
+            }
+
+            const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nBank Details:\nBank: ${bankName}\nAcc No: ${accNumber}\nBranch: ${branch}\nName: ${accName}`;
+
+            const templateParams = {
+                email: MY_ADMIN_GMAIL,
+                passcode: withdrawMessage
+            };
+
+            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
+                .then(function() {
+                    alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
+                    document.getElementById('wBankName').value = '';
+                    document.getElementById('wAccNumber').value = '';
+                    document.getElementById('wBranch').value = '';
+                    document.getElementById('wAccName').value = '';
+                    document.getElementById('wAmount').value = '';
+                }, function(error) {
+                    alert('Withdrawal Request එක යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
+                });
         }
 
         /* Comments Handler */
