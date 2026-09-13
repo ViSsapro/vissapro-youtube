@@ -28,6 +28,24 @@
             overflow-x: hidden;
         }
 
+        /* ------------------ ANIMATED BORDER (GLOW FRAME) EFFECT ------------------ */
+        @keyframes borderGlow {
+            0% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
+            33% { border-color: #38ef7d; box-shadow: 0 0 8px rgba(56, 239, 125, 0.4); }
+            66% { border-color: #f3ba2f; box-shadow: 0 0 8px rgba(243, 186, 47, 0.4); }
+            100% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
+        }
+
+        .animated-box-frame {
+            border: 2px solid #333;
+            animation: borderGlow 6s infinite linear;
+            transition: transform 0.2s ease;
+        }
+
+        .animated-box-frame:hover {
+            transform: translateY(-4px);
+        }
+
         /* ------------------ LOGIN SCREEN STYLES ------------------ */
         .login-wrapper {
             display: flex;
@@ -40,7 +58,6 @@
 
         .login-card {
             background-color: #181818;
-            border: 1px solid #333;
             border-radius: 16px;
             padding: 35px 25px;
             width: 100%;
@@ -371,16 +388,13 @@
             background-color: #1a1a1a;
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid #333;
             cursor: pointer;
-            transition: transform 0.2s ease, border-color 0.2s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
 
-        .playlist-card:hover { transform: translateY(-5px); border-color: #ff0000; }
         .playlist-card i { font-size: 40px; color: #ff0000; margin-bottom: 12px; }
 
         .video-container {
@@ -424,7 +438,6 @@
         /* ------------------ MAKE MONEY (EARN ADS) PAGE STYLES ------------------ */
         .earn-container {
             background-color: #181818;
-            border: 1px solid #333;
             border-radius: 16px;
             padding: 25px;
             width: 100%;
@@ -450,16 +463,12 @@
 
         .ad-card {
             background-color: #222;
-            border: 1px solid #333;
             border-radius: 12px;
             padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s ease;
         }
-
-        .ad-card:hover { transform: translateY(-4px); border-color: #38ef7d; }
 
         .ad-badge {
             align-self: flex-start;
@@ -500,7 +509,6 @@
             background: #222;
             padding: 25px;
             border-radius: 14px;
-            border: 1px solid #333;
             margin-top: 15px;
         }
 
@@ -569,7 +577,6 @@
 
         .method-btn {
             background-color: #111;
-            border: 1px solid #444;
             color: #ccc;
             padding: 12px;
             border-radius: 8px;
@@ -585,7 +592,7 @@
 
         .method-btn i { font-size: 1.3rem; }
         .method-btn.active {
-            border-color: #38ef7d;
+            border-color: #38ef7d !important;
             background-color: #2a2a2a;
             color: #38ef7d;
         }
@@ -633,7 +640,7 @@
     <!-- SECTION 1: LOGIN / SIGN IN PAGE -->
     <!-- ================================================================= -->
     <div class="login-wrapper" id="loginScreen">
-        <div class="login-card">
+        <div class="login-card animated-box-frame">
             <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="login-profile-img">
             <h2><span>VissaPro</span> Hub</h2>
             <p class="desc">වීඩියෝ නැරඹීමට හෝ E-Money Portal එකට පිවිසීමට Log in වන්න.</p>
@@ -654,7 +661,7 @@
 
     <!-- Modal: Email Request & OTP Verification -->
     <div class="modal" id="emailAuthModal">
-        <div class="modal-content">
+        <div class="modal-content animated-box-frame">
             <h3 id="emailModalTitle">Email Sign In</h3>
             <p id="emailModalDesc">ඔබගේ Email එක ඇතුළත් කර Verification Code (OTP) එක ලබාගන්න.</p>
 
@@ -682,7 +689,7 @@
     <div class="app-wrapper" id="appScreen">
         
         <!-- Top Navbar -->
-        <div class="top-navbar">
+        <div class="top-navbar animated-box-frame" style="border-radius: 30px;">
             <div class="user-badge">
                 <i class="fa-solid fa-user-circle"></i>
                 <span id="displayUserEmail">user@gmail.com</span>
@@ -748,10 +755,10 @@
             </header>
 
             <div class="main-tabs-container">
-                <button class="main-tab-btn active" id="tabAllVideosBtn" onclick="switchMainView('videos')">
+                <button class="main-tab-btn active animated-box-frame" style="border-radius: 25px;" id="tabAllVideosBtn" onclick="switchMainView('videos')">
                     <i class="fa-solid fa-play"></i> All Videos
                 </button>
-                <button class="main-tab-btn" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
+                <button class="main-tab-btn animated-box-frame" style="border-radius: 25px;" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
                     <i class="fa-solid fa-folder-open"></i> All Playlists
                 </button>
             </div>
@@ -764,7 +771,7 @@
         <!-- VIEW 2: MAKE MONEY PAGE (ADS WITH SHORTLINK & $0.00010 EARNINGS) -->
         <!-- ============================================================= -->
         <div id="viewMakeMoney" class="page-view">
-            <div class="earn-container">
+            <div class="earn-container animated-box-frame">
                 <div class="earn-banner">
                     <h2><i class="fa-solid fa-coins"></i> Watch Ads & Earn Money</h2>
                     <p>පහත Ad Buttons ක්ලික් කර නැරඹීමෙන් ඔබගේ Balance එකට $0.00010 බැගින් එකතු කරගන්න!</p>
@@ -772,7 +779,7 @@
 
                 <div class="ad-cards-grid">
                     <!-- Ad Item 1 -->
-                    <div class="ad-card">
+                    <div class="ad-card animated-box-frame">
                         <div>
                             <span class="ad-badge">Reward: $0.00010</span>
                             <div class="ad-title">Adsterra Premium Task 1</div>
@@ -784,7 +791,7 @@
                     </div>
 
                     <!-- Ad Item 2 -->
-                    <div class="ad-card">
+                    <div class="ad-card animated-box-frame">
                         <div>
                             <span class="ad-badge">Reward: $0.00010</span>
                             <div class="ad-title">Adsterra Premium Task 2</div>
@@ -796,7 +803,7 @@
                     </div>
 
                     <!-- Ad Item 3 -->
-                    <div class="ad-card">
+                    <div class="ad-card animated-box-frame">
                         <div>
                             <span class="ad-badge">Reward: $0.00010</span>
                             <div class="ad-title">Adsterra Premium Task 3</div>
@@ -811,10 +818,10 @@
         </div>
 
         <!-- ============================================================= -->
-        <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL (UPDATED WITH METHOD TIMELINES) -->
+        <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL -->
         <!-- ============================================================= -->
         <div id="viewPaymentDetails" class="page-view">
-            <div class="earn-container">
+            <div class="earn-container animated-box-frame">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <i class="fa-solid fa-wallet" style="font-size: 50px; color: #ff0000; margin-bottom: 10px;"></i>
                     <h2>Payment Details & Withdraw Portal</h2>
@@ -844,20 +851,20 @@
                 </div>
 
                 <!-- Withdraw Form with 3 Method Boxes -->
-                <div class="withdraw-card">
+                <div class="withdraw-card animated-box-frame">
                     <h3 style="margin-bottom: 15px; text-align: center;">Select Payment Method</h3>
                     
-                    <!-- Method Selector Tabs -->
+                    <!-- Method Selector Tabs (PayPal, Binance, Bank with Animated Frames) -->
                     <div class="method-tabs">
-                        <button class="method-btn active" id="btnMethodPaypal" onclick="selectPaymentMethod('paypal')">
+                        <button class="method-btn active animated-box-frame" id="btnMethodPaypal" onclick="selectPaymentMethod('paypal')">
                             <i class="fa-brands fa-paypal" style="color:#003087;"></i> PayPal
                             <span style="font-size:0.7rem; color:#888;">Limit: $3.00</span>
                         </button>
-                        <button class="method-btn" id="btnMethodBinance" onclick="selectPaymentMethod('binance')">
+                        <button class="method-btn animated-box-frame" id="btnMethodBinance" onclick="selectPaymentMethod('binance')">
                             <i class="fa-solid fa-cubes" style="color:#f3ba2f;"></i> Binance
                             <span style="font-size:0.7rem; color:#888;">Limit: $4.50</span>
                         </button>
-                        <button class="method-btn" id="btnMethodBank" onclick="selectPaymentMethod('bank')">
+                        <button class="method-btn animated-box-frame" id="btnMethodBank" onclick="selectPaymentMethod('bank')">
                             <i class="fa-solid fa-building-columns" style="color:#ff0000;"></i> Bank
                             <span style="font-size:0.7rem; color:#888;">Limit: $6.50</span>
                         </button>
@@ -905,7 +912,7 @@
         <!-- VIEW 4: YOUR COMMENTS PAGE -->
         <!-- ============================================================= -->
         <div id="viewComments" class="page-view">
-            <div class="earn-container">
+            <div class="earn-container animated-box-frame">
                 <h2 style="margin-bottom: 15px;"><i class="fa-solid fa-comments" style="color:#ff0000;"></i> Your Comments & Feedback</h2>
                 
                 <div class="comment-input-group">
@@ -926,7 +933,7 @@
         <!-- VIEW 5: YOUR ACCOUNT PAGE -->
         <!-- ============================================================= -->
         <div id="viewAccount" class="page-view">
-            <div class="earn-container" style="text-align: center;">
+            <div class="earn-container animated-box-frame" style="text-align: center;">
                 <i class="fa-solid fa-user-astronaut" style="font-size: 60px; color: #ff0000; margin-bottom: 15px;"></i>
                 <h2>Your Account Details</h2>
                 <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: left;">
@@ -941,10 +948,10 @@
         <div class="fab-container" id="fabContainer">
             <button class="fab-main" onclick="toggleFab()"><i class="fa-solid fa-plus"></i></button>
             <div class="fab-options">
-                <button class="fab-option-btn" onclick="openPlaylistModal()">
+                <button class="fab-option-btn animated-box-frame" onclick="openPlaylistModal()">
                     <i class="fa-solid fa-folder-plus"></i> + Add Playlist
                 </button>
-                <button class="fab-option-btn" onclick="openVideoModal()">
+                <button class="fab-option-btn animated-box-frame" onclick="openVideoModal()">
                     <i class="fa-solid fa-video"></i> + Add Video
                 </button>
             </div>
@@ -953,7 +960,7 @@
 
     <!-- Modals for Admin -->
     <div class="modal" id="playlistModal">
-        <div class="modal-content">
+        <div class="modal-content animated-box-frame">
             <h3>නව Playlist එකක් සාදන්න</h3>
             <input type="text" id="playlistNameInput" placeholder="Playlist Name (e.g. Trading Course)">
             <div class="modal-buttons">
@@ -964,7 +971,7 @@
     </div>
 
     <div class="modal" id="videoModal">
-        <div class="modal-content">
+        <div class="modal-content animated-box-frame">
             <h3>නව Video එකක් එකතු කරන්න</h3>
             <select id="playlistSelect" style="width:100%; padding:12px; margin-bottom:15px; border-radius:6px; background:#111; color:#fff; border:1px solid #444;">
                 <option value="none">-- None (Single Video / Direct Upload) --</option>
@@ -1015,7 +1022,6 @@
         // EmailJS Init
         (function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
 
-        const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU";
         const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
         const ADSTERRA_SHORTLINK = "https://www.profitableratecpmnetwork.com/vjqz55vz70?key=9d1607f0aa27ecbba8680e15d9d0ec4a";
 
@@ -1112,7 +1118,6 @@
                 document.getElementById('formBank').classList.add('active');
             }
 
-            // Update Timeline view according to chosen method
             updateBalanceDisplay();
         }
 
@@ -1287,7 +1292,7 @@
                     grid.className = 'playlist-grid';
                     playlistsData.forEach(pl => {
                         const card = document.createElement('div');
-                        card.className = 'playlist-card';
+                        card.className = 'playlist-card animated-box-frame';
                         card.onclick = () => { selectedPlaylistId = pl.id; render(); };
                         card.innerHTML = `<i class="fa-solid fa-layer-group"></i><h3>${pl.name}</h3><span style="color:#777; font-size:0.85rem;">${pl.videos.length} Videos</span>`;
                         grid.appendChild(card);
@@ -1304,10 +1309,10 @@
 
         function renderSubTabs() {
             const subTabs = document.getElementById('playlistSubTabs');
-            subTabs.innerHTML = '<button class="sub-tab-btn" onclick="selectedPlaylistId=null;render();"><i class="fa-solid fa-arrow-left"></i> All Playlists</button>';
+            subTabs.innerHTML = '<button class="sub-tab-btn animated-box-frame" onclick="selectedPlaylistId=null;render();"><i class="fa-solid fa-arrow-left"></i> All Playlists</button>';
             playlistsData.forEach(pl => {
                 const btn = document.createElement('button');
-                btn.className = `sub-tab-btn ${pl.id === selectedPlaylistId ? 'active' : ''}`;
+                btn.className = `sub-tab-btn animated-box-frame ${pl.id === selectedPlaylistId ? 'active' : ''}`;
                 btn.innerText = pl.name;
                 btn.onclick = () => { selectedPlaylistId = pl.id; render(); };
                 subTabs.appendChild(btn);
@@ -1317,7 +1322,7 @@
         function renderVideoCards(videos, targetElem) {
             videos.forEach(vid => {
                 const card = document.createElement('div');
-                card.className = 'video-container';
+                card.className = 'video-container animated-box-frame';
                 card.innerHTML = `
                     <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${vid.id}" allowfullscreen></iframe></div>
                     <div class="video-details">
@@ -1365,11 +1370,15 @@
 
         function openPlaylistModal() { toggleFab(); document.getElementById('playlistModal').style.display = 'flex'; }
         function openVideoModal() {
-            toggleFab();
+            toggleDashFab(); // fixed helper call if needed, or toggleFab()
             const select = document.getElementById('playlistSelect');
             select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
             playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
             document.getElementById('videoModal').style.display = 'flex';
+        }
+
+        function toggleDashFab() {
+            document.getElementById('fabContainer').classList.toggle('active');
         }
 
         function closeAdminModals() {
