@@ -249,7 +249,7 @@
 
     <script>
         // Google Cloud YouTube Data API v3 Key (නොමිලේ ලබාගත හැක)
-        const YOUTUBE_API_KEY = "YOUR_YOUTUBE_API_KEY_HERE"; 
+        const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU"; 
 
         // Initial Saved Videos Storage (Local Storage මගින් Save වේ)
         let videosData = JSON.parse(localStorage.getItem('vissaProVideos')) || [];
@@ -291,7 +291,7 @@
 
         // Fetch details automatically using YouTube Data API
         async function fetchVideoDetails(videoId) {
-            if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "YOUR_YOUTUBE_API_KEY_HERE") {
+            if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU") {
                 return null;
             }
             try {
