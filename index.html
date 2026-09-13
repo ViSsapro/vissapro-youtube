@@ -6,8 +6,10 @@
     <title>VissaPro - Authentication & Portal</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -184,7 +186,7 @@
 
         /* ------------------ MAIN APP SCREEN STYLES ------------------ */
         .app-wrapper {
-            display: none; /* Shown after Login */
+            display: none;
             width: 100%;
             max-width: 800px;
             padding: 20px;
@@ -420,7 +422,7 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            display: none; /* Managed by JS based on Admin check */
+            display: none;
             flex-direction: column-reverse;
             align-items: flex-end;
             gap: 12px;
@@ -487,7 +489,7 @@
         <div class="login-card">
             <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="login-profile-img">
             <h2><span>VissaPro</span> Hub</h2>
-            <p class="desc">වීඩියෝ නැරඹීමට හෝ එකතු කිරීමට කරුණාකර Log ইন වන්න.</p>
+            <p class="desc">වීඩියෝ නැරඹීමට හෝ එකතු කිරීමට කරුණාකර Log in වන්න.</p>
 
             <div class="auth-btn-group">
                 <!-- Google Sign-In Button -->
@@ -618,14 +620,66 @@
     </div>
 
     <!-- ================================================================= -->
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- FIREBASE MODULE & JAVASCRIPT LOGIC -->
     <!-- ================================================================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
+            authDomain: "vissapro-aa91d.firebaseapp.com",
+            projectId: "vissapro-aa91d",
+            storageBucket: "vissapro-aa91d.firebasestorage.app",
+            messagingSenderId: "866553327331",
+            appId: "1:866553327331:web:60ef47fa0c88a942571fd6",
+            measurementId: "G-VBNN5652DD"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Make login triggers available globally for HTML buttons
+        window.triggerGoogleLogin = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const email = result.user.email;
+                    window.loginSuccess(email);
+                })
+                .catch((error) => {
+                    alert("Google Sign-In Error: " + error.message);
+                });
+        };
+
+        window.triggerFacebookLogin = function() {
+            const provider = new FacebookAuthProvider();
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const email = result.user.email || "facebook_user@vissapro.com";
+                    window.loginSuccess(email);
+                })
+                .catch((error) => {
+                    alert("Facebook Sign-In Error: " + error.message);
+                });
+        };
+    </script>
+
     <script>
+        // EmailJS Init - Integrated Public Key
+        (function(){
+            emailjs.init("PjusIs1VJ5zFRcuZp");
+        })();
+
         const YOUTUBE_API_KEY = "AIzaSyCA6M-37CRLzqW2q-eR25vR2BVplpUTwDU";
         
         // ---------------------------------------------------------------------
-        // 🔑 ඔබගේ ADMIN GMAIL LIKPINEYA METHANATA LABA DENNA!
-        const MY_ADMIN_GMAIL = "YOUR_ADMIN_GMAIL@gmail.com"; 
+        // 🔑 ADMIN GMAIL ADDRESS
+        const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
         // ---------------------------------------------------------------------
 
         let generatedOTP = null;
@@ -645,25 +699,8 @@
             }
         };
 
-        // --- AUTHENTICATION FLOWS ---
+        // --- EMAIL OTP AUTHENTICATION ---
 
-        // 1. Google Auth Simulation
-        function triggerGoogleLogin() {
-            const emailPrompt = prompt("Google Sign-In: කරුණාකර ඔබගේ Gmail ලිපිනය ඇතුළත් කරන්න:");
-            if (emailPrompt) {
-                loginSuccess(emailPrompt.trim());
-            }
-        }
-
-        // 2. Facebook Auth Simulation
-        function triggerFacebookLogin() {
-            const emailPrompt = prompt("Facebook Sign-In: කරුණාකර ඔබගේ Facebook වලට සම්බන්ධ Email එක ඇතුළත් කරන්න:");
-            if (emailPrompt) {
-                loginSuccess(emailPrompt.trim());
-            }
-        }
-
-        // 3. Email + Verification Code (OTP) Flow
         function openEmailModal() {
             document.getElementById('emailAuthModal').style.display = 'flex';
             document.getElementById('otpStep1').style.display = 'block';
@@ -675,22 +712,29 @@
         }
 
         function sendOTPCode() {
-            const email = document.getElementById('userEmailInput').value.trim();
-            if (!email || !email.includes('@')) {
+            const userEmail = document.getElementById('userEmailInput').value.trim();
+            if (!userEmail || !userEmail.includes('@')) {
                 alert('කරුණාකර නිවැරදි Email ලිපිනයක් ඇතුළත් කරන්න!');
                 return;
             }
 
-            pendingEmail = email;
-            // Generate Random 6 Digit OTP Code
+            pendingEmail = userEmail;
             generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
 
-            // Simulate Email Sending with Alert
-            alert(`[VERIFICATION CODE SENT]\n\nඔබගේ ${email} ලිපිනය සඳහා Verification Code එක: ${generatedOTP}`);
+            const templateParams = {
+                email: userEmail,
+                passcode: generatedOTP
+            };
 
-            document.getElementById('otpStep1').style.display = 'none';
-            document.getElementById('otpStep2').style.display = 'block';
-            document.getElementById('emailModalDesc').innerText = `${email} වෙත යවන ලද 6-digit කෝඩ් එක මෙතැනට ඇතුළත් කරන්න.`;
+            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
+                .then(function(response) {
+                    alert(`Verification Code එක ${userEmail} වෙත යවන ලදී. කරුණාකර Inbox/Spam පරීක්ෂා කරන්න.`);
+                    document.getElementById('otpStep1').style.display = 'none';
+                    document.getElementById('otpStep2').style.display = 'block';
+                    document.getElementById('emailModalDesc').innerText = `${userEmail} වෙත යවන ලද 6-digit කෝඩ් එක ඇතුළත් කරන්න.`;
+                }, function(error) {
+                    alert('Email යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
+                });
         }
 
         function verifyOTPCode() {
@@ -701,7 +745,7 @@
                 closeAuthModal();
                 loginSuccess(pendingEmail);
             } else {
-                alert('වැරදි Verification Code එකකි. කරුණාකර නැවත උත්සාහ කරන්න.');
+                alert('වැරදි Verification Code එකකි. නැවත උත්සාහ කරන්න.');
             }
         }
 
@@ -723,11 +767,11 @@
             if (email.toLowerCase() === MY_ADMIN_GMAIL.toLowerCase()) {
                 roleElem.innerText = "Admin (Creator)";
                 roleElem.className = "badge-role admin";
-                fabElem.style.display = "flex"; // Show Upload Button only for Admin
+                fabElem.style.display = "flex";
             } else {
                 roleElem.innerText = "Viewer";
                 roleElem.className = "badge-role";
-                fabElem.style.display = "none"; // Hide Upload Button for viewers
+                fabElem.style.display = "none";
             }
 
             render();
