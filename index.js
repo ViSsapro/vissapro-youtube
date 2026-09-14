@@ -487,7 +487,7 @@ window.addVideo = async function() {
     const titleInputElem = document.getElementById('customTitle');
     const descInputElem = document.getElementById('customDesc');
 
-    // Title හෝ Description හිස්ව තැබුවහොත් ස්වයංක්‍රීයව Default අගයන් Auto-fill වීම
+    // Title සහ Description ලබා ගැනීම (හිස් නම් auto-fill වීමට සකසා ඇත)
     let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Exclusive Video";
     let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
 
