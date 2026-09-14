@@ -646,10 +646,10 @@
             <p class="desc">වීඩියෝ නැරඹීමට හෝ E-Money Portal එකට පිවිසීමට Log in වන්න.</p>
 
             <div class="auth-btn-group">
-                <button class="auth-btn btn-google" onclick="triggerGoogleLogin()">
+                <button class="auth-btn btn-google" id="googleLoginBtn">
                     <i class="fa-brands fa-google" style="color: #ea4335;"></i> Sign in with Google
                 </button>
-                <button class="auth-btn btn-facebook" onclick="triggerFacebookLogin()">
+                <button class="auth-btn btn-facebook" id="facebookLoginBtn">
                     <i class="fa-brands fa-facebook-f"></i> Sign in with Facebook
                 </button>
                 <button class="auth-btn btn-email" onclick="openEmailModal()">
@@ -744,9 +744,7 @@
             </ul>
         </div>
 
-        <!-- ============================================================= -->
-        <!-- VIEW 1: HOME PAGE (VIDEOS & PLAYLISTS) -->
-        <!-- ============================================================= -->
+        <!-- VIEW 1: HOME PAGE -->
         <div id="viewHome" class="page-view active-view">
             <header>
                 <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="profile-img">
@@ -767,9 +765,7 @@
             <div class="content-container" id="mainContent"></div>
         </div>
 
-        <!-- ============================================================= -->
         <!-- VIEW 2: MAKE MONEY PAGE -->
-        <!-- ============================================================= -->
         <div id="viewMakeMoney" class="page-view">
             <div class="earn-container animated-box-frame">
                 <div class="earn-banner">
@@ -814,9 +810,7 @@
             </div>
         </div>
 
-        <!-- ============================================================= -->
         <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL -->
-        <!-- ============================================================= -->
         <div id="viewPaymentDetails" class="page-view">
             <div class="earn-container animated-box-frame">
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -897,9 +891,7 @@
             </div>
         </div>
 
-        <!-- ============================================================= -->
-        <!-- VIEW 4: YOUR COMMENTS PAGE -->
-        <!-- ============================================================= -->
+        <!-- VIEW 4: COMMENTS PAGE -->
         <div id="viewComments" class="page-view">
             <div class="earn-container animated-box-frame">
                 <h2 style="margin-bottom: 15px;"><i class="fa-solid fa-comments" style="color:#ff0000;"></i> Your Comments & Feedback</h2>
@@ -918,9 +910,7 @@
             </div>
         </div>
 
-        <!-- ============================================================= -->
-        <!-- VIEW 5: YOUR ACCOUNT PAGE -->
-        <!-- ============================================================= -->
+        <!-- VIEW 5: ACCOUNT PAGE -->
         <div id="viewAccount" class="page-view">
             <div class="earn-container animated-box-frame" style="text-align: center;">
                 <i class="fa-solid fa-user-astronaut" style="font-size: 60px; color: #ff0000; margin-bottom: 15px;"></i>
@@ -975,7 +965,7 @@
         </div>
     </div>
 
-    <!-- FIREBASE MODULE & JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC & FIREBASE MODULE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -994,26 +984,25 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Global functions attachment for HTML button triggers
         window.triggerGoogleLogin = function() {
             const provider = new GoogleAuthProvider();
             signInWithPopup(auth, provider)
-                .then((res) => { window.loginSuccess(res.user.email); })
+                .then((res) => { loginSuccess(res.user.email); })
                 .catch((err) => { alert("Google Sign-In Error: " + err.message); });
         };
 
         window.triggerFacebookLogin = function() {
             const provider = new FacebookAuthProvider();
             signInWithPopup(auth, provider)
-                .then((res) => { window.loginSuccess(res.user.email || "facebook_user@vissapro.com"); })
+                .then((res) => { loginSuccess(res.user.email || "facebook_user@vissapro.com"); })
                 .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
         };
 
-        // ============================================================
-        // FIRESTORE CLOUD DATABASE
-        // Single videos: appData/singleVideosDoc -> { videos: [...] }
-        // Playlists: playlists/<playlistId>
-        // ============================================================
+        document.getElementById('googleLoginBtn').addEventListener('click', window.triggerGoogleLogin);
+        document.getElementById('facebookLoginBtn').addEventListener('click', window.triggerFacebookLogin);
 
+        // Firestore Data Fetching & Saving
         window.cloudFetchData = async function() {
             try {
                 const singleDocRef = doc(db, "appData", "singleVideosDoc");
@@ -1040,36 +1029,8 @@
                 });
 
                 return { singleVideos: sVideos, playlistsData: pData };
-
             } catch (e) {
                 console.error("Firestore Fetch Error:", e);
-                throw e;
-            }
-        };
-
-        window.cloudSaveSingleVideos = async function(videosList) {
-            try {
-                await setDoc(doc(db, "appData", "singleVideosDoc"), {
-                    videos: Array.isArray(videosList) ? videosList : []
-                });
-                return true;
-            } catch (e) {
-                console.error("Single Video Save Error:", e);
-                throw e;
-            }
-        };
-
-        window.cloudSavePlaylists = async function(playlistsList) {
-            try {
-                for (const pl of playlistsList || []) {
-                    await setDoc(doc(db, "playlists", pl.id), {
-                        ...pl,
-                        videos: Array.isArray(pl.videos) ? pl.videos : []
-                    });
-                }
-                return true;
-            } catch (e) {
-                console.error("Playlist Save Error:", e);
                 throw e;
             }
         };
@@ -1095,10 +1056,7 @@
                     });
                 } else {
                     const targetPl = (playlistsArr || []).find(p => p.id === targetPlId);
-
-                    if (!targetPl) {
-                        throw new Error("Selected playlist was not found.");
-                    }
+                    if (!targetPl) throw new Error("Selected playlist was not found.");
 
                     await setDoc(doc(db, "playlists", targetPl.id), {
                         ...targetPl,
@@ -1109,6 +1067,15 @@
             } catch (e) {
                 console.error("Add Video Error:", e);
                 throw e;
+            }
+        };
+
+        // Initialize App on load
+        window.onload = async function() {
+            const loggedUser = localStorage.getItem('vissaLoggedUser');
+            if (loggedUser) { 
+                await loadCloudData();
+                initDashboard(loggedUser); 
             }
         };
     </script>
@@ -1131,51 +1098,21 @@
         let userBalance = parseFloat(localStorage.getItem('vissaUserBalance')) || 0.00000;
         let selectedPaymentMethod = 'paypal';
 
-        // App Data State
         let singleVideos = [];
         let playlistsData = [];
         let currentView = 'videos';
         let selectedPlaylistId = null;
 
-        window.onload = async function() {
-            const loggedUser = localStorage.getItem('vissaLoggedUser');
-            if (loggedUser) { 
-                await loadCloudData();
-                initDashboard(loggedUser); 
-            }
-        };
-
         async function loadCloudData() {
             if (!window.cloudFetchData) return false;
-
             try {
                 const dbRes = await window.cloudFetchData();
-
-                // Firebase is the source of truth.
-                singleVideos = Array.isArray(dbRes.singleVideos)
-                    ? dbRes.singleVideos
-                    : [];
-
-                playlistsData = Array.isArray(dbRes.playlistsData)
-                    ? dbRes.playlistsData
-                    : [];
-
-                // Cache only; never use this cache to override Firebase.
+                singleVideos = Array.isArray(dbRes.singleVideos) ? dbRes.singleVideos : [];
+                playlistsData = Array.isArray(dbRes.playlistsData) ? dbRes.playlistsData : [];
                 localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
-
                 return true;
             } catch (e) {
                 console.error("loadCloudData Error:", e);
-
-                let message = "Cloud data load failed.
-
-";
-                if (e && e.code === "permission-denied") {
-                    message += "Firebase Firestore Rules වල read permission එක check කරන්න.";
-                } else {
-                    message += e.message || "Unknown Firebase error.";
-                }
-                alert(message);
                 return false;
             }
         }
@@ -1292,12 +1229,7 @@
 
             const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nCurrent User Total Balance: $${userBalance.toFixed(5)}\nRequired Threshold Passed: $${minLimit.toFixed(2)}\n\n--- Withdrawal Details ---\n${detailsText}`;
 
-            const templateParams = {
-                email: MY_ADMIN_GMAIL,
-                passcode: withdrawMessage
-            };
-
-            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', templateParams)
+            emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: MY_ADMIN_GMAIL, passcode: withdrawMessage })
                 .then(function() {
                     alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
                     userBalance -= parseFloat(amount);
@@ -1350,7 +1282,7 @@
             } else { alert('වැරදි Verification Code එකකි!'); }
         }
 
-        window.loginSuccess = async function(email) {
+        async function loginSuccess(email) {
             localStorage.setItem('vissaLoggedUser', email);
             await loadCloudData();
             initDashboard(email);
@@ -1464,32 +1396,19 @@
 
         async function addPlaylist() {
             const name = document.getElementById('playlistNameInput').value.trim();
+            if (!name) { alert("කරුණාකර Playlist Name එකක් ඇතුළත් කරන්න!"); return; }
 
-            if (!name) {
-                alert("කරුණාකර Playlist Name එකක් ඇතුළත් කරන්න!");
-                return;
-            }
-
-            const newPl = {
-                id: 'pl_' + Date.now(),
-                name: name,
-                videos: []
-            };
+            const newPl = { id: 'pl_' + Date.now(), name: name, videos: [] };
 
             try {
                 await window.cloudAddPlaylistToDB(newPl);
                 playlistsData.push(newPl);
-
                 closeAdminModals();
                 document.getElementById('playlistNameInput').value = '';
                 switchMainView('playlists');
-
-                alert("Playlist එක Firebase Cloud එකට සාර්ථකව save වුණා. අනෙක් devices වලත් පෙන්වයි.");
+                alert("Playlist එක සාර්ථකව සාදන ලදී.");
             } catch (e) {
-                console.error("addPlaylist Error:", e);
-                alert("Playlist save කිරීමට නොහැකි විය.
-
-" + (e.message || "Firebase error"));
+                alert("Playlist save කිරීමට නොහැකි විය: " + e.message);
             }
         }
 
@@ -1501,96 +1420,42 @@
         async function addVideo() {
             const targetPlId = document.getElementById('playlistSelect').value;
             const linkInput = document.getElementById('ytLinkInput').value.trim();
+            const title = document.getElementById('customTitle').value.trim() || "VissaPro Video";
+            const description = document.getElementById('customDesc').value.trim() || "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
 
-            const title =
-                document.getElementById('customTitle').value.trim() ||
-                "VissaPro Video";
-
-            const description =
-                document.getElementById('customDesc').value.trim() ||
-                "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
-
-            if (!linkInput) {
-                alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!");
-                return;
-            }
+            if (!linkInput) { alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!"); return; }
 
             const videoId = extractVideoID(linkInput);
+            if (!videoId || videoId.length !== 11) { alert("නිවැරදි YouTube Video Link එකක් ඇතුළත් කරන්න!"); return; }
 
-            if (!videoId || videoId.length !== 11) {
-                alert("නිවැරදි YouTube Video Link එකක් ඇතුළත් කරන්න!");
-                return;
-            }
-
-            const newVidObj = {
-                id: videoId,
-                title: title,
-                description: description
-            };
+            const newVidObj = { id: videoId, title: title, description: description };
 
             try {
-                const nextSingleVideos = [...singleVideos];
-
-                const nextPlaylistsData = playlistsData.map(pl => ({
-                    ...pl,
-                    videos: Array.isArray(pl.videos) ? [...pl.videos] : []
-                }));
+                let nextSingleVideos = [...singleVideos];
+                let nextPlaylistsData = playlistsData.map(pl => ({ ...pl, videos: [...pl.videos] }));
 
                 if (targetPlId === 'none') {
                     nextSingleVideos.unshift(newVidObj);
                 } else {
                     const targetPl = nextPlaylistsData.find(pl => pl.id === targetPlId);
-
-                    if (!targetPl) {
-                        alert("Selected playlist එක හමු වුණේ නැහැ.");
-                        return;
-                    }
-
+                    if (!targetPl) { alert("Selected playlist එක හමු වුණේ නැහැ."); return; }
                     targetPl.videos.unshift(newVidObj);
                 }
 
-                // Save to Firebase first. Update the UI only after success.
-                await window.cloudAddVideoToDB(
-                    targetPlId,
-                    newVidObj,
-                    nextSingleVideos,
-                    nextPlaylistsData
-                );
+                await window.cloudAddVideoToDB(targetPlId, newVidObj, nextSingleVideos, nextPlaylistsData);
 
                 singleVideos = nextSingleVideos;
                 playlistsData = nextPlaylistsData;
-
-                localStorage.setItem(
-                    'vissaSingleVideos',
-                    JSON.stringify(singleVideos)
-                );
+                localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
 
                 closeAdminModals();
-
                 document.getElementById('ytLinkInput').value = '';
                 document.getElementById('customTitle').value = '';
                 document.getElementById('customDesc').value = '';
-
                 render();
-
-                alert(
-                    "Video එක Firebase Cloud එකට සාර්ථකව save වුණා!
-
-" +
-                    "Phone/laptop ඇතුළු අනෙක් devices වල login/refresh කළාම පෙන්වයි."
-                );
-
+                alert("Video එක සාර්ථකව එකතු කරන ලදී!");
             } catch (e) {
-                console.error("addVideo Error:", e);
-                alert(
-                    "Video save කිරීමට නොහැකි විය.
-
-" +
-                    (e.message || "Firebase error") +
-                    "
-
-Firebase Firestore Rules / permissions check කරන්න."
-                );
+                alert("Video save කිරීමට නොහැකි විය: " + e.message);
             }
         }
 
@@ -1601,10 +1466,6 @@ Firebase Firestore Rules / permissions check කරන්න."
             select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
             playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
             document.getElementById('videoModal').style.display = 'flex';
-        }
-
-        function toggleDashFab() {
-            document.getElementById('fabContainer').classList.toggle('active');
         }
 
         function closeAdminModals() {
