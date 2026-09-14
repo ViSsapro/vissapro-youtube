@@ -1,0 +1,621 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0f0f0f;
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+/* ------------------ ANIMATED BORDER (GLOW FRAME) EFFECT ------------------ */
+@keyframes borderGlow {
+    0% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
+    33% { border-color: #38ef7d; box-shadow: 0 0 8px rgba(56, 239, 125, 0.4); }
+    66% { border-color: #f3ba2f; box-shadow: 0 0 8px rgba(243, 186, 47, 0.4); }
+    100% { border-color: #ff0000; box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
+}
+
+.animated-box-frame {
+    border: 2px solid #333;
+    animation: borderGlow 6s infinite linear;
+    transition: transform 0.2s ease;
+}
+
+.animated-box-frame:hover {
+    transform: translateY(-4px);
+}
+
+/* ------------------ LOGIN SCREEN STYLES ------------------ */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-card {
+    background-color: #181818;
+    border-radius: 16px;
+    padding: 35px 25px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+
+.login-profile-img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid #ff0000;
+    object-fit: cover;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+
+.login-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+.login-card h2 span {
+    color: #ff0000;
+}
+
+.login-card p.desc {
+    color: #aaa;
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+}
+
+.auth-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 25px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.btn-google { background-color: #ffffff; color: #222222; }
+.btn-facebook { background-color: #1877f2; color: #ffffff; }
+.btn-email { background-color: #ff0000; color: #ffffff; }
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 20px;
+}
+
+.modal-content {
+    background-color: #222;
+    padding: 25px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.modal-content h3 { margin-bottom: 10px; color: #fff; }
+.modal-content p { font-size: 0.85rem; color: #aaa; margin-bottom: 15px; }
+.modal-content input, .modal-content textarea, .modal-content select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background-color: #111;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-submit { background-color: #ff0000; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-cancel { background-color: #444; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+
+/* ------------------ MAIN APP SCREEN STYLES ------------------ */
+.app-wrapper {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.top-navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #181818;
+    padding: 12px 20px;
+    border-radius: 30px;
+    margin-bottom: 25px;
+    border: 1px solid #333;
+}
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.user-badge i { color: #ff0000; }
+
+.badge-role {
+    background: #333;
+    color: #aaa;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    margin-left: 5px;
+}
+
+.badge-role.admin { background: #ff0000; color: #fff; }
+
+.nav-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu-hamburger-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.menu-hamburger-btn:hover { color: #ff0000; }
+
+/* RIGHT SLIDE-OUT MENU (DRAWER) */
+.side-menu-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2500;
+    display: none;
+}
+
+.side-menu-drawer {
+    position: fixed;
+    top: 0; right: -300px;
+    width: 280px; height: 100vh;
+    background-color: #141414;
+    border-left: 1px solid #2a2a2a;
+    z-index: 2600;
+    transition: right 0.3s ease;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.side-menu-drawer.open { right: 0; }
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #252525;
+    margin-bottom: 20px;
+}
+
+.drawer-header h3 { font-size: 1.2rem; color: #fff; }
+
+.close-drawer-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.close-drawer-btn:hover { color: #fff; }
+
+.drawer-nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.drawer-nav-item button {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #ccc;
+    padding: 12px 15px;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.drawer-nav-item button i { width: 20px; color: #ff0000; }
+
+.drawer-nav-item button:hover, .drawer-nav-item button.active {
+    background-color: #222;
+    color: #fff;
+}
+
+.drawer-nav-item button.highlight-green {
+    background: linear-gradient(45deg, #11998e, #38ef7d);
+    color: #000;
+}
+
+/* ------------------ VIEWS CONTAINER ------------------ */
+.page-view { display: none; width: 100%; }
+.page-view.active-view { display: block; }
+
+/* Video / Home Tab Styles */
+header { text-align: center; margin-bottom: 25px; }
+
+.profile-img {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 3px solid #ff0000;
+    object-fit: cover;
+    margin-bottom: 12px;
+}
+
+.main-tabs-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #222;
+    padding-bottom: 15px;
+}
+
+.main-tab-btn {
+    background-color: #1e1e1e;
+    color: #aaa;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid #333;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.main-tab-btn.active, .main-tab-btn:hover {
+    background-color: #ff0000;
+    color: #fff;
+    border-color: #ff0000;
+}
+
+.sub-tabs-container {
+    width: 100%;
+    margin-bottom: 25px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 8px;
+    display: none;
+}
+
+.sub-tab-btn {
+    display: inline-block;
+    background-color: #222;
+    color: #ccc;
+    padding: 8px 16px;
+    margin-right: 8px;
+    border-radius: 18px;
+    border: 1px solid #333;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.sub-tab-btn.active { background-color: #ffffff; color: #000; }
+
+.playlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.playlist-card {
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.playlist-card i { font-size: 40px; color: #ff0000; margin-bottom: 12px; }
+
+.video-container {
+    background-color: #1f1f1f;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-bottom: 30px;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    background: #000;
+}
+
+.video-wrapper iframe {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%; border: 0;
+}
+
+.video-details { padding: 20px; }
+.video-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
+.video-description {
+    color: #ccc; font-size: 0.95rem; line-height: 1.6;
+    background-color: #2a2a2a; padding: 12px;
+    border-radius: 8px; border-left: 4px solid #ff0000;
+    margin-bottom: 15px; white-space: pre-wrap;
+    max-height: 140px; overflow-y: auto;
+}
+
+.yt-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background-color: #ff0000; color: #ffffff;
+    padding: 8px 18px; text-decoration: none;
+    font-weight: bold; border-radius: 20px; font-size: 0.9rem;
+}
+
+/* ------------------ MAKE MONEY (EARN ADS) PAGE STYLES ------------------ */
+.earn-container {
+    background-color: #181818;
+    border-radius: 16px;
+    padding: 25px;
+    width: 100%;
+}
+
+.earn-banner {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    border-radius: 12px;
+    padding: 25px;
+    color: #000;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.earn-banner h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+.earn-banner p { font-size: 1rem; font-weight: 600; opacity: 0.9; }
+
+.ad-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.ad-card {
+    background-color: #222;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ad-badge {
+    align-self: flex-start;
+    background: rgba(56, 239, 125, 0.2);
+    color: #38ef7d;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.ad-title { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+.ad-desc { color: #aaa; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.4; }
+
+.btn-watch-ad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(45deg, #ff0000, #ff5252);
+    color: #ffffff;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+    transition: transform 0.2s;
+}
+
+.btn-watch-ad:hover { transform: scale(1.02); filter: brightness(1.1); }
+
+/* ------------------ PAYMENT & WITHDRAW STYLES ------------------ */
+.withdraw-card {
+    background: #222;
+    padding: 25px;
+    border-radius: 14px;
+    margin-top: 15px;
+}
+
+.withdraw-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background-color: #111;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.balance-badge-box {
+    background: linear-gradient(45deg, #11998e, #38ef7d);
+    color: #000;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Target Timeline / Progress Bar for Selected Method */
+.timeline-box {
+    background: #111;
+    border: 1px solid #333;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 14px;
+    background-color: #222;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #444;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff0000, #38ef7d);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Method Selection Tabs (Binance, Bank, Paypal) */
+.method-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.method-btn {
+    background-color: #111;
+    color: #ccc;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.method-btn i { font-size: 1.3rem; }
+.method-btn.active {
+    border-color: #38ef7d !important;
+    background-color: #2a2a2a;
+    color: #38ef7d;
+}
+
+.method-form { display: none; }
+.method-form.active { display: block; }
+
+/* Floating (+) Admin Button */
+.fab-container {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    display: none;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 12px;
+    z-index: 2000;
+}
+
+.fab-main {
+    width: 60px; height: 60px;
+    background-color: #ff0000; color: white;
+    border-radius: 50%; display: flex;
+    justify-content: center; align-items: center;
+    font-size: 26px; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
+    cursor: pointer; border: none; transition: transform 0.3s ease;
+}
+
+.fab-container.active .fab-main { transform: rotate(45deg); background-color: #444; }
+.fab-options { display: none; flex-direction: column; gap: 10px; align-items: flex-end; }
+.fab-container.active .fab-options { display: flex; }
+
+.fab-option-btn {
+    display: flex; align-items: center; gap: 10px;
+    background-color: #222; color: white;
+    padding: 10px 16px; border-radius: 25px;
+    border: 1px solid #444; cursor: pointer;
+    font-weight: 600; white-space: nowrap;
+}
+.fab-option-btn i { color: #ff0000; }
