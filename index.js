@@ -30,8 +30,11 @@ window.triggerFacebookLogin = function() {
         .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
 };
 
-document.getElementById('googleLoginBtn').addEventListener('click', window.triggerGoogleLogin);
-document.getElementById('facebookLoginBtn').addEventListener('click', window.triggerFacebookLogin);
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+if (googleLoginBtn) googleLoginBtn.addEventListener('click', window.triggerGoogleLogin);
+
+const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', window.triggerFacebookLogin);
 
 // Firestore Data Fetching & Saving
 window.cloudFetchData = async function() {
@@ -167,14 +170,18 @@ async function loadCloudData() {
     }
 }
 
-function toggleSideMenu() {
+// Fixed: Attached to window to prevent undefined errors in HTML onclick
+window.toggleSideMenu = function() {
     const drawer = document.getElementById('sideDrawer');
     const overlay = document.getElementById('menuOverlay');
-    drawer.classList.toggle('open');
-    overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
-}
+    if (drawer && overlay) {
+        drawer.classList.toggle('open');
+        overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
+    }
+};
 
-function switchPageView(page) {
+// Fixed: Attached to window to handle page switching properly
+window.switchPageView = function(page) {
     document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
     document.querySelectorAll('.drawer-nav-item button').forEach(b => b.classList.remove('active'));
 
@@ -186,30 +193,41 @@ function switchPageView(page) {
         'account': 'viewAccount'
     };
     
-    document.getElementById(targetMap[page]).classList.add('active-view');
-    document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
-    toggleSideMenu();
-}
+    const targetView = document.getElementById(targetMap[page]);
+    if (targetView) targetView.classList.add('active-view');
+
+    const navBtn = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
+    if (navBtn) navBtn.classList.add('active');
+
+    window.toggleSideMenu();
+};
 
 function updateBalanceDisplay() {
     localStorage.setItem('vissaUserBalance', userBalance.toFixed(5));
 
     const formatted = '$' + userBalance.toFixed(5);
-    document.getElementById('accBalance').innerText = formatted;
-    document.getElementById('withdrawDisplayBalance').innerText = formatted;
+    const accBalanceEl = document.getElementById('accBalance');
+    const withdrawDisplayBalanceEl = document.getElementById('withdrawDisplayBalance');
+    if (accBalanceEl) accBalanceEl.innerText = formatted;
+    if (withdrawDisplayBalanceEl) withdrawDisplayBalanceEl.innerText = formatted;
 
     const currentLimit = LIMITS[selectedPaymentMethod];
     const methodNameCap = selectedPaymentMethod.charAt(0).toUpperCase() + selectedPaymentMethod.slice(1);
     
-    document.getElementById('timelineTitleText').innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
-    document.getElementById('timelineMaxText').innerText = `$${currentLimit.toFixed(2)}`;
+    const timelineTitleText = document.getElementById('timelineTitleText');
+    const timelineMaxText = document.getElementById('timelineMaxText');
+    if (timelineTitleText) timelineTitleText.innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
+    if (timelineMaxText) timelineMaxText.innerText = `$${currentLimit.toFixed(2)}`;
 
     const percent = Math.min((userBalance / currentLimit) * 100, 100).toFixed(2);
-    document.getElementById('timelinePercent').innerText = percent + '%';
-    document.getElementById('timelineBarFill').style.width = percent + '%';
+    const timelinePercent = document.getElementById('timelinePercent');
+    const timelineBarFill = document.getElementById('timelineBarFill');
+    if (timelinePercent) timelinePercent.innerText = percent + '%';
+    if (timelineBarFill) timelineBarFill.style.width = percent + '%';
 
     const remaining = Math.max(0, currentLimit - userBalance).toFixed(5);
-    document.getElementById('remainingText').innerText = `Remaining: $${remaining}`;
+    const remainingText = document.getElementById('remainingText');
+    if (remainingText) remainingText.innerText = `Remaining: $${remaining}`;
 }
 
 window.watchAdAction = function(adTitle) {
@@ -225,14 +243,20 @@ window.selectPaymentMethod = function(method) {
     document.querySelectorAll('.method-form').forEach(f => f.classList.remove('active'));
 
     if (method === 'paypal') {
-        document.getElementById('btnMethodPaypal').classList.add('active');
-        document.getElementById('formPaypal').classList.add('active');
+        const btn = document.getElementById('btnMethodPaypal');
+        const form = document.getElementById('formPaypal');
+        if (btn) btn.classList.add('active');
+        if (form) form.classList.add('active');
     } else if (method === 'binance') {
-        document.getElementById('btnMethodBinance').classList.add('active');
-        document.getElementById('formBinance').classList.add('active');
+        const btn = document.getElementById('btnMethodBinance');
+        const form = document.getElementById('formBinance');
+        if (btn) btn.classList.add('active');
+        if (form) form.classList.add('active');
     } else if (method === 'bank') {
-        document.getElementById('btnMethodBank').classList.add('active');
-        document.getElementById('formBank').classList.add('active');
+        const btn = document.getElementById('btnMethodBank');
+        const form = document.getElementById('formBank');
+        if (btn) btn.classList.add('active');
+        if (form) form.classList.add('active');
     }
 
     updateBalanceDisplay();
@@ -240,7 +264,8 @@ window.selectPaymentMethod = function(method) {
 
 window.requestWithdrawal = function() {
     const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
-    const amount = document.getElementById('wAmount').value.trim();
+    const amountInput = document.getElementById('wAmount');
+    const amount = amountInput ? amountInput.value.trim() : "";
     const minLimit = LIMITS[selectedPaymentMethod];
     let detailsText = "";
 
@@ -261,18 +286,24 @@ window.requestWithdrawal = function() {
     }
 
     if (selectedPaymentMethod === 'paypal') {
-        const ppEmail = document.getElementById('wPaypalEmail').value.trim();
+        const ppEmailEl = document.getElementById('wPaypalEmail');
+        const ppEmail = ppEmailEl ? ppEmailEl.value.trim() : "";
         if (!ppEmail) { alert('කරුණාකර PayPal Email එක ඇතුළත් කරන්න!'); return; }
         detailsText = `Method: PayPal\nPayPal Email: ${ppEmail}`;
     } else if (selectedPaymentMethod === 'binance') {
-        const bId = document.getElementById('wBinanceId').value.trim();
+        const bIdEl = document.getElementById('wBinanceId');
+        const bId = bIdEl ? bIdEl.value.trim() : "";
         if (!bId) { alert('කරුණාකර Binance Pay ID හෝ Address එක ඇතුළත් කරන්න!'); return; }
         detailsText = `Method: Binance\nBinance Pay ID/Address: ${bId}`;
     } else if (selectedPaymentMethod === 'bank') {
-        const bank = document.getElementById('wBankName').value.trim();
-        const acc = document.getElementById('wAccNumber').value.trim();
-        const branch = document.getElementById('wBranch').value.trim();
-        const name = document.getElementById('wAccName').value.trim();
+        const bankEl = document.getElementById('wBankName');
+        const accEl = document.getElementById('wAccNumber');
+        const branchEl = document.getElementById('wBranch');
+        const nameEl = document.getElementById('wAccName');
+        const bank = bankEl ? bankEl.value.trim() : "";
+        const acc = accEl ? accEl.value.trim() : "";
+        const branch = branchEl ? branchEl.value.trim() : "";
+        const name = nameEl ? nameEl.value.trim() : "";
         if (!bank || !acc || !branch || !name) { alert('කරුණාකර සියලුම බැංකු තොරතුරු ඇතුළත් කරන්න!'); return; }
         detailsText = `Method: Bank Transfer\nBank: ${bank}\nAcc No: ${acc}\nBranch: ${branch}\nName: ${name}`;
     }
@@ -284,34 +315,45 @@ window.requestWithdrawal = function() {
             alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
             userBalance -= parseFloat(amount);
             updateBalanceDisplay();
-            document.getElementById('wAmount').value = '';
+            if (amountInput) amountInput.value = '';
         }, function(error) {
             alert('යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
         });
 };
 
 window.postComment = function() {
-    const text = document.getElementById('newCommentText').value.trim();
+    const commentInput = document.getElementById('newCommentText');
+    const text = commentInput ? commentInput.value.trim() : "";
     const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
 
     if (!text) { alert('කරුණාකර Comment එකක් ලියන්න!'); return; }
 
     const list = document.getElementById('commentsList');
-    const newComment = document.createElement('div');
-    newComment.style = "background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;";
-    newComment.innerHTML = `
-        <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">${loggedUser}</div>
-        <div style="font-size:0.95rem; color:#ddd;">${text}</div>
-    `;
-    list.prepend(newComment);
-    document.getElementById('newCommentText').value = '';
+    if (list) {
+        const newComment = document.createElement('div');
+        newComment.style = "background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;";
+        newComment.innerHTML = `
+            <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">${loggedUser}</div>
+            <div style="font-size:0.95rem; color:#ddd;">${text}</div>
+        `;
+        list.prepend(newComment);
+    }
+    if (commentInput) commentInput.value = '';
 };
 
-window.openEmailModal = function() { document.getElementById('emailAuthModal').style.display = 'flex'; };
-window.closeAuthModal = function() { document.getElementById('emailAuthModal').style.display = 'none'; };
+window.openEmailModal = function() { 
+    const modal = document.getElementById('emailAuthModal');
+    if (modal) modal.style.display = 'flex'; 
+};
+
+window.closeAuthModal = function() { 
+    const modal = document.getElementById('emailAuthModal');
+    if (modal) modal.style.display = 'none'; 
+};
 
 window.sendOTPCode = function() {
-    const userEmail = document.getElementById('userEmailInput').value.trim();
+    const emailInput = document.getElementById('userEmailInput');
+    const userEmail = emailInput ? emailInput.value.trim() : "";
     if (!userEmail || !userEmail.includes('@')) { alert('කරුණාකර නිවැරදි Email එකක් ඇතුළත් කරන්න!'); return; }
 
     pendingEmail = userEmail;
@@ -320,13 +362,16 @@ window.sendOTPCode = function() {
     emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: userEmail, passcode: generatedOTP })
         .then(function() {
             alert(`Verification Code එක ${userEmail} වෙත යවන ලදී.`);
-            document.getElementById('otpStep1').style.display = 'none';
-            document.getElementById('otpStep2').style.display = 'block';
+            const step1 = document.getElementById('otpStep1');
+            const step2 = document.getElementById('otpStep2');
+            if (step1) step1.style.display = 'none';
+            if (step2) step2.style.display = 'block';
         }, function(err) { alert('දෝෂයක් සිදු විය: ' + JSON.stringify(err)); });
 };
 
 window.verifyOTPCode = function() {
-    if (document.getElementById('otpInput').value.trim() === generatedOTP) {
+    const otpInput = document.getElementById('otpInput');
+    if (otpInput && otpInput.value.trim() === generatedOTP) {
         closeAuthModal();
         loginSuccess(pendingEmail);
     } else { alert('වැරදි Verification Code එකකි!'); }
@@ -339,23 +384,32 @@ async function loginSuccess(email) {
 }
 
 function initDashboard(email) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appScreen').style.display = 'flex';
-    document.getElementById('displayUserEmail').innerText = email;
-    document.getElementById('accEmail').innerText = email;
+    const loginScreen = document.getElementById('loginScreen');
+    const appScreen = document.getElementById('appScreen');
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (appScreen) appScreen.style.display = 'flex';
+    
+    const displayUserEmail = document.getElementById('displayUserEmail');
+    const accEmail = document.getElementById('accEmail');
+    if (displayUserEmail) displayUserEmail.innerText = email;
+    if (accEmail) accEmail.innerText = email;
 
     const roleElem = document.getElementById('displayUserRole');
     const fabElem = document.getElementById('fabContainer');
 
     if (email.toLowerCase() === MY_ADMIN_GMAIL.toLowerCase()) {
-        roleElem.innerText = "Admin (Creator)";
-        roleElem.className = "badge-role admin";
-        fabElem.style.display = "flex";
+        if (roleElem) {
+            roleElem.innerText = "Admin (Creator)";
+            roleElem.className = "badge-role admin";
+        }
+        if (fabElem) fabElem.style.display = "flex";
         isAdminLoggedIn = true;
     } else {
-        roleElem.innerText = "Viewer";
-        roleElem.className = "badge-role";
-        fabElem.style.display = "none";
+        if (roleElem) {
+            roleElem.innerText = "Viewer";
+            roleElem.className = "badge-role";
+        }
+        if (fabElem) fabElem.style.display = "none";
         isAdminLoggedIn = false;
     }
 
@@ -365,25 +419,33 @@ function initDashboard(email) {
 
 window.logout = function() {
     localStorage.removeItem('vissaLoggedUser');
-    document.getElementById('appScreen').style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'flex';
+    const appScreen = document.getElementById('appScreen');
+    const loginScreen = document.getElementById('loginScreen');
+    if (appScreen) appScreen.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'flex';
 };
 
-window.toggleFab = function() { document.getElementById('fabContainer').classList.toggle('active'); };
+window.toggleFab = function() { 
+    const fab = document.getElementById('fabContainer');
+    if (fab) fab.classList.toggle('active'); 
+};
 
 window.switchMainView = function(view) {
     currentView = view;
     selectedPlaylistId = null;
-    document.getElementById('tabAllVideosBtn').classList.toggle('active', view === 'videos');
-    document.getElementById('tabPlaylistsBtn').classList.toggle('active', view === 'playlists');
+    const tabVideos = document.getElementById('tabAllVideosBtn');
+    const tabPlaylists = document.getElementById('tabPlaylistsBtn');
+    if (tabVideos) tabVideos.classList.toggle('active', view === 'videos');
+    if (tabPlaylists) tabPlaylists.classList.toggle('active', view === 'playlists');
     render();
 };
 
 function render() {
     const container = document.getElementById('mainContent');
     const subTabs = document.getElementById('playlistSubTabs');
+    if (!container) return;
     container.innerHTML = '';
-    subTabs.style.display = 'none';
+    if (subTabs) subTabs.style.display = 'none';
 
     if (currentView === 'videos') {
         let allCombined = [...singleVideos];
@@ -410,7 +472,7 @@ function render() {
             });
             container.appendChild(grid);
         } else {
-            subTabs.style.display = 'flex';
+            if (subTabs) subTabs.style.display = 'flex';
             renderSubTabs();
             const currentPl = playlistsData.find(pl => pl.id === selectedPlaylistId);
             if (currentPl) renderVideoCards(currentPl.videos, container, currentPl.id);
@@ -420,6 +482,7 @@ function render() {
 
 function renderSubTabs() {
     const subTabs = document.getElementById('playlistSubTabs');
+    if (!subTabs) return;
     subTabs.innerHTML = '<button class="sub-tab-btn animated-box-frame" onclick="selectedPlaylistId=null;render();"><i class="fa-solid fa-arrow-left"></i> All Playlists</button>';
     playlistsData.forEach(pl => {
         const btn = document.createElement('button');
@@ -457,7 +520,8 @@ function renderVideoCards(videos, targetElem, playlistContextId) {
 }
 
 window.addPlaylist = async function() {
-    const name = document.getElementById('playlistNameInput').value.trim();
+    const nameInput = document.getElementById('playlistNameInput');
+    const name = nameInput ? nameInput.value.trim() : "";
     if (!name) { alert("කරුණාකර Playlist Name එකක් ඇතුළත් කරන්න!"); return; }
 
     const newPl = { id: 'pl_' + Date.now(), name: name, videos: [] };
@@ -466,7 +530,7 @@ window.addPlaylist = async function() {
         await window.cloudAddPlaylistToDB(newPl);
         playlistsData.push(newPl);
         closeAdminModals();
-        document.getElementById('playlistNameInput').value = '';
+        if (nameInput) nameInput.value = '';
         switchMainView('playlists');
         alert("Playlist එක සාර්ථකව සාදන ලදී.");
     } catch (e) {
@@ -481,13 +545,14 @@ function extractVideoID(url) {
 }
 
 window.addVideo = async function() {
-    const targetPlId = document.getElementById('playlistSelect').value;
-    const linkInput = document.getElementById('ytLinkInput').value.trim();
+    const targetPlEl = document.getElementById('playlistSelect');
+    const linkInputEl = document.getElementById('ytLinkInput');
+    const targetPlId = targetPlEl ? targetPlEl.value : 'none';
+    const linkInput = linkInputEl ? linkInputEl.value.trim() : "";
     
     const titleInputElem = document.getElementById('customTitle');
     const descInputElem = document.getElementById('customDesc');
 
-    // Title සහ Description ලබා ගැනීම (හිස් නම් auto-fill වීමට සකසා ඇත)
     let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Exclusive Video";
     let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
 
@@ -532,10 +597,9 @@ window.addVideo = async function() {
 
         closeAdminModals();
         
-        // Input fields clear කිරීම
-        document.getElementById('ytLinkInput').value = '';
-        if(titleInputElem) titleInputElem.value = '';
-        if(descInputElem) descInputElem.value = '';
+        if (linkInputEl) linkInputEl.value = '';
+        if (titleInputElem) titleInputElem.value = '';
+        if (descInputElem) descInputElem.value = '';
         
         render();
         alert("Video එක, Title එක සහ Description එක සාර්ථකව Save විය!");
@@ -575,16 +639,26 @@ window.removeVideo = async function(playlistId, videoFirebaseId) {
     }
 };
 
-window.openPlaylistModal = function() { toggleFab(); document.getElementById('playlistModal').style.display = 'flex'; };
+window.openPlaylistModal = function() { 
+    toggleFab(); 
+    const modal = document.getElementById('playlistModal');
+    if (modal) modal.style.display = 'flex'; 
+};
+
 window.openVideoModal = function() {
     toggleFab();
     const select = document.getElementById('playlistSelect');
-    select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
-    playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
-    document.getElementById('videoModal').style.display = 'flex';
+    if (select) {
+        select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
+        playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
+    }
+    const modal = document.getElementById('videoModal');
+    if (modal) modal.style.display = 'flex';
 };
 
 window.closeAdminModals = function() {
-    document.getElementById('playlistModal').style.display = 'none';
-    document.getElementById('videoModal').style.display = 'none';
+    const plModal = document.getElementById('playlistModal');
+    const vidModal = document.getElementById('videoModal');
+    if (plModal) plModal.style.display = 'none';
+    if (vidModal) vidModal.style.display = 'none';
 };
