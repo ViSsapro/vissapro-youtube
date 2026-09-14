@@ -487,8 +487,9 @@ window.addVideo = async function() {
     const titleInputElem = document.getElementById('customTitle');
     const descInputElem = document.getElementById('customDesc');
 
-    const title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Video";
-    const description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
+    // Title සහ Description ලබා ගැනීම (හිස් නම් auto-fill වීමට සකසා ඇත)
+    let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Exclusive Video";
+    let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
 
     if (!linkInput) { 
         alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!"); 
@@ -531,12 +532,13 @@ window.addVideo = async function() {
 
         closeAdminModals();
         
+        // Input fields clear කිරීම
         document.getElementById('ytLinkInput').value = '';
         if(titleInputElem) titleInputElem.value = '';
         if(descInputElem) descInputElem.value = '';
         
         render();
-        alert("Video එක සහ විස්තර සාර්ථකව එකතු කරන ලදී!");
+        alert("Video එක, Title එක සහ Description එක සාර්ථකව Save විය!");
     } catch (e) {
         alert("Video save කිරීමට නොහැකි විය: " + e.message);
     }
