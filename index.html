@@ -979,7 +979,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
@@ -1008,57 +1008,108 @@
                 .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
         };
 
-        // Cloud Database Functions for Videos & Playlists
+        // ============================================================
+        // FIRESTORE CLOUD DATABASE
+        // Single videos: appData/singleVideosDoc -> { videos: [...] }
+        // Playlists: playlists/<playlistId>
+        // ============================================================
+
         window.cloudFetchData = async function() {
             try {
-                // Fetch Single Videos
-                const svSnap = await getDocs(collection(db, "singleVideos"));
-                let sVideos = [];
-                svSnap.forEach(d => { sVideos.push(d.data()); });
+                const singleDocRef = doc(db, "appData", "singleVideosDoc");
+                const singleDocSnap = await getDoc(singleDocRef);
 
-                // Fetch Playlists
+                let sVideos = [];
+                if (singleDocSnap.exists()) {
+                    const data = singleDocSnap.data();
+                    if (Array.isArray(data.videos)) {
+                        sVideos = data.videos;
+                    }
+                }
+
                 const plSnap = await getDocs(collection(db, "playlists"));
-                let pData = [];
-                plSnap.forEach(d => { pData.push(d.data()); });
+                const pData = [];
+
+                plSnap.forEach(d => {
+                    const data = d.data();
+                    pData.push({
+                        id: data.id || d.id,
+                        name: data.name || "Untitled Playlist",
+                        videos: Array.isArray(data.videos) ? data.videos : []
+                    });
+                });
 
                 return { singleVideos: sVideos, playlistsData: pData };
+
             } catch (e) {
-                console.error("Fetch Error: ", e);
-                return { singleVideos: [], playlistsData: [] };
+                console.error("Firestore Fetch Error:", e);
+                throw e;
             }
         };
 
         window.cloudSaveSingleVideos = async function(videosList) {
             try {
-                await setDoc(doc(db, "appData", "singleVideosDoc"), { videos: videosList });
-            } catch (e) { console.error(e); }
+                await setDoc(doc(db, "appData", "singleVideosDoc"), {
+                    videos: Array.isArray(videosList) ? videosList : []
+                });
+                return true;
+            } catch (e) {
+                console.error("Single Video Save Error:", e);
+                throw e;
+            }
         };
 
         window.cloudSavePlaylists = async function(playlistsList) {
             try {
-                for (let pl of playlistsList) {
-                    await setDoc(doc(db, "playlists", pl.id), pl);
+                for (const pl of playlistsList || []) {
+                    await setDoc(doc(db, "playlists", pl.id), {
+                        ...pl,
+                        videos: Array.isArray(pl.videos) ? pl.videos : []
+                    });
                 }
-            } catch (e) { console.error(e); }
+                return true;
+            } catch (e) {
+                console.error("Playlist Save Error:", e);
+                throw e;
+            }
         };
 
         window.cloudAddPlaylistToDB = async function(plObj) {
             try {
-                await setDoc(doc(db, "playlists", plObj.id), plObj);
-            } catch (e) { console.error(e); }
+                await setDoc(doc(db, "playlists", plObj.id), {
+                    ...plObj,
+                    videos: Array.isArray(plObj.videos) ? plObj.videos : []
+                });
+                return true;
+            } catch (e) {
+                console.error("Add Playlist Error:", e);
+                throw e;
+            }
         };
-        
+
         window.cloudAddVideoToDB = async function(targetPlId, newVidObj, singleVideosArr, playlistsArr) {
             try {
                 if (targetPlId === 'none') {
-                    await setDoc(doc(db, "appData", "singleVideosDoc"), { videos: singleVideosArr });
+                    await setDoc(doc(db, "appData", "singleVideosDoc"), {
+                        videos: Array.isArray(singleVideosArr) ? singleVideosArr : []
+                    });
                 } else {
-                    const targetPl = playlistsArr.find(p => p.id === targetPlId);
-                    if (targetPl) {
-                        await setDoc(doc(db, "playlists", targetPl.id), targetPl);
+                    const targetPl = (playlistsArr || []).find(p => p.id === targetPlId);
+
+                    if (!targetPl) {
+                        throw new Error("Selected playlist was not found.");
                     }
+
+                    await setDoc(doc(db, "playlists", targetPl.id), {
+                        ...targetPl,
+                        videos: Array.isArray(targetPl.videos) ? targetPl.videos : []
+                    });
                 }
-            } catch (e) { console.error(e); }
+                return true;
+            } catch (e) {
+                console.error("Add Video Error:", e);
+                throw e;
+            }
         };
     </script>
 
@@ -1095,12 +1146,37 @@
         };
 
         async function loadCloudData() {
-            if (window.cloudFetchData) {
-                // Also fetch single videos from doc if stored
+            if (!window.cloudFetchData) return false;
+
+            try {
                 const dbRes = await window.cloudFetchData();
-                playlistsData = dbRes.playlistsData || [];
-                // Fallback / sync single videos
-                singleVideos = JSON.parse(localStorage.getItem('vissaSingleVideos')) || [];
+
+                // Firebase is the source of truth.
+                singleVideos = Array.isArray(dbRes.singleVideos)
+                    ? dbRes.singleVideos
+                    : [];
+
+                playlistsData = Array.isArray(dbRes.playlistsData)
+                    ? dbRes.playlistsData
+                    : [];
+
+                // Cache only; never use this cache to override Firebase.
+                localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
+
+                return true;
+            } catch (e) {
+                console.error("loadCloudData Error:", e);
+
+                let message = "Cloud data load failed.
+
+";
+                if (e && e.code === "permission-denied") {
+                    message += "Firebase Firestore Rules වල read permission එක check කරන්න.";
+                } else {
+                    message += e.message || "Unknown Firebase error.";
+                }
+                alert(message);
+                return false;
             }
         }
 
@@ -1388,17 +1464,33 @@
 
         async function addPlaylist() {
             const name = document.getElementById('playlistNameInput').value.trim();
-            if (!name) return;
-            const newPl = { id: 'pl_' + Date.now(), name: name, videos: [] };
-            playlistsData.push(newPl);
-            
-            if (window.cloudAddPlaylistToDB) {
-                await window.cloudAddPlaylistToDB(newPl);
+
+            if (!name) {
+                alert("කරුණාකර Playlist Name එකක් ඇතුළත් කරන්න!");
+                return;
             }
 
-            closeAdminModals();
-            document.getElementById('playlistNameInput').value = '';
-            switchMainView('playlists');
+            const newPl = {
+                id: 'pl_' + Date.now(),
+                name: name,
+                videos: []
+            };
+
+            try {
+                await window.cloudAddPlaylistToDB(newPl);
+                playlistsData.push(newPl);
+
+                closeAdminModals();
+                document.getElementById('playlistNameInput').value = '';
+                switchMainView('playlists');
+
+                alert("Playlist එක Firebase Cloud එකට සාර්ථකව save වුණා. අනෙක් devices වලත් පෙන්වයි.");
+            } catch (e) {
+                console.error("addPlaylist Error:", e);
+                alert("Playlist save කිරීමට නොහැකි විය.
+
+" + (e.message || "Firebase error"));
+            }
         }
 
         function extractVideoID(url) {
@@ -1409,32 +1501,102 @@
         async function addVideo() {
             const targetPlId = document.getElementById('playlistSelect').value;
             const linkInput = document.getElementById('ytLinkInput').value.trim();
-            let title = document.getElementById('customTitle').value.trim() || "VissaPro Video";
-            let description = document.getElementById('customDesc').value.trim() || "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
 
-            if (!linkInput) return;
+            const title =
+                document.getElementById('customTitle').value.trim() ||
+                "VissaPro Video";
+
+            const description =
+                document.getElementById('customDesc').value.trim() ||
+                "YouTube එක හරහා වීඩියෝ එක නරඹන්න.";
+
+            if (!linkInput) {
+                alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!");
+                return;
+            }
+
             const videoId = extractVideoID(linkInput);
-            const newVidObj = { id: videoId, title: title, description: description };
 
-            if (targetPlId === 'none') { 
-                singleVideos.unshift(newVidObj);
-                localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
-            } else {
-                const targetPl = playlistsData.find(pl => pl.id === targetPlId);
-                if (targetPl) targetPl.videos.unshift(newVidObj);
+            if (!videoId || videoId.length !== 11) {
+                alert("නිවැරදි YouTube Video Link එකක් ඇතුළත් කරන්න!");
+                return;
             }
 
-            if (window.cloudAddVideoToDB) {
-                await window.cloudAddVideoToDB(targetPlId, newVidObj, singleVideos, playlistsData);
-            }
+            const newVidObj = {
+                id: videoId,
+                title: title,
+                description: description
+            };
 
-            closeAdminModals(); 
-            render();
+            try {
+                const nextSingleVideos = [...singleVideos];
+
+                const nextPlaylistsData = playlistsData.map(pl => ({
+                    ...pl,
+                    videos: Array.isArray(pl.videos) ? [...pl.videos] : []
+                }));
+
+                if (targetPlId === 'none') {
+                    nextSingleVideos.unshift(newVidObj);
+                } else {
+                    const targetPl = nextPlaylistsData.find(pl => pl.id === targetPlId);
+
+                    if (!targetPl) {
+                        alert("Selected playlist එක හමු වුණේ නැහැ.");
+                        return;
+                    }
+
+                    targetPl.videos.unshift(newVidObj);
+                }
+
+                // Save to Firebase first. Update the UI only after success.
+                await window.cloudAddVideoToDB(
+                    targetPlId,
+                    newVidObj,
+                    nextSingleVideos,
+                    nextPlaylistsData
+                );
+
+                singleVideos = nextSingleVideos;
+                playlistsData = nextPlaylistsData;
+
+                localStorage.setItem(
+                    'vissaSingleVideos',
+                    JSON.stringify(singleVideos)
+                );
+
+                closeAdminModals();
+
+                document.getElementById('ytLinkInput').value = '';
+                document.getElementById('customTitle').value = '';
+                document.getElementById('customDesc').value = '';
+
+                render();
+
+                alert(
+                    "Video එක Firebase Cloud එකට සාර්ථකව save වුණා!
+
+" +
+                    "Phone/laptop ඇතුළු අනෙක් devices වල login/refresh කළාම පෙන්වයි."
+                );
+
+            } catch (e) {
+                console.error("addVideo Error:", e);
+                alert(
+                    "Video save කිරීමට නොහැකි විය.
+
+" +
+                    (e.message || "Firebase error") +
+                    "
+
+Firebase Firestore Rules / permissions check කරන්න."
+                );
+            }
         }
 
         function openPlaylistModal() { toggleFab(); document.getElementById('playlistModal').style.display = 'flex'; }
         function openVideoModal() {
-            toggleDashFab();
+            toggleFab();
             const select = document.getElementById('playlistSelect');
             select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
             playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
