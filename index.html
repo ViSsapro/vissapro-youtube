@@ -1350,7 +1350,7 @@
             } else { alert('වැරදි Verification Code එකකි!'); }
         }
 
-        async function loginSuccess(email) {
+        window.loginSuccess = async function(email) {
             localStorage.setItem('vissaLoggedUser', email);
             await loadCloudData();
             initDashboard(email);
