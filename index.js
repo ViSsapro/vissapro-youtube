@@ -36,7 +36,7 @@ if (googleLoginBtn) googleLoginBtn.addEventListener('click', window.triggerGoogl
 const facebookLoginBtn = document.getElementById('facebookLoginBtn');
 if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', window.triggerFacebookLogin);
 
-// Firestore Data Fetching & Saving
+// Firestore Data Fetching & Saving (Fixed)
 window.cloudFetchData = async function() {
     try {
         const singleDocRef = doc(db, "appData", "singleVideosDoc");
@@ -47,6 +47,8 @@ window.cloudFetchData = async function() {
             const data = singleDocSnap.data();
             if (Array.isArray(data.videos)) {
                 sVideos = data.videos;
+            } else if (Array.isArray(data.singleVideos)) {
+                sVideos = data.singleVideos;
             }
         }
 
@@ -65,7 +67,7 @@ window.cloudFetchData = async function() {
         return { singleVideos: sVideos, playlistsData: pData };
     } catch (e) {
         console.error("Firestore Fetch Error:", e);
-        throw e;
+        return { singleVideos: [], playlistsData: [] };
     }
 };
 
