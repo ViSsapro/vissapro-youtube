@@ -139,7 +139,6 @@ window.onload = async function() {
 (function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
 
 const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
-const ADSTERRA_SHORTLINK = "https://www.profitableratecpmnetwork.com/vjqz55vz70?key=9d1607f0aa27ecbba8680e15d9d0ec4a";
 
 const LIMITS = {
     paypal: 3.00,
@@ -232,10 +231,18 @@ function updateBalanceDisplay() {
     if (remainingText) remainingText.innerText = `Remaining: $${remaining}`;
 }
 
+// Monetag Vignette Ad Integration Function
 window.watchAdAction = function(adTitle) {
-    window.open(ADSTERRA_SHORTLINK, '_blank');
+    // Monetag Vignette script dynamically load කිරීම
+    const script = document.createElement('script');
+    script.dataset.zone = '11825528';
+    script.src = 'https://n6wxm.com/vignette.min.js';
+    document.body.appendChild(script);
+
+    // User ගේ ගිණුමට මුදල් එකතු වීම සහ Balance එක update කිරීම
     userBalance += 0.00010;
     updateBalanceDisplay();
+    
     alert(`"${adTitle}" සක්‍රිය විය! $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
 };
 
