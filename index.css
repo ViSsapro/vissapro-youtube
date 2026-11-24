@@ -442,6 +442,14 @@ header { text-align: center; margin-bottom: 25px; }
 .earn-banner h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
 .earn-banner p { font-size: 1rem; font-weight: 600; opacity: 0.9; }
 
+.smart-link-box {
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 22px;
+    text-align: center;
+}
+
 .ad-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
