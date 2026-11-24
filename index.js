@@ -15,6 +15,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Adsterra Smart Link Configuration
+const ADSTERRA_SMART_LINK_ID = "32448041";
+const ADSTERRA_SMART_LINK_URL = "https://asiafilm.org/4/e875e6d20cac06112cea6ce10ce02bd7";
+
+window.openSmartLink = function() {
+    window.open(ADSTERRA_SMART_LINK_URL, "_blank", "noopener,noreferrer");
+};
+
 // Global functions attachment for HTML button triggers
 window.triggerGoogleLogin = function() {
     const provider = new GoogleAuthProvider();
@@ -129,16 +137,16 @@ window.cloudUpdateDatabase = async function(singleVideosArr, playlistsArr) {
 // Initialize App on load
 window.onload = async function() {
     const loggedUser = localStorage.getItem('vissaLoggedUser');
-    if (loggedUser) { 
+    if (loggedUser) {
         await loadCloudData();
-        initDashboard(loggedUser); 
+        initDashboard(loggedUser);
     }
 };
 
 // EmailJS Init
 (function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
 
-const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
+const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com";
 
 const LIMITS = {
     paypal: 3.00,
@@ -193,7 +201,7 @@ window.switchPageView = function(page) {
         'comments': 'viewComments',
         'account': 'viewAccount'
     };
-    
+
     const targetView = document.getElementById(targetMap[page]);
     if (targetView) targetView.classList.add('active-view');
 
@@ -214,7 +222,7 @@ function updateBalanceDisplay() {
 
     const currentLimit = LIMITS[selectedPaymentMethod];
     const methodNameCap = selectedPaymentMethod.charAt(0).toUpperCase() + selectedPaymentMethod.slice(1);
-    
+
     const timelineTitleText = document.getElementById('timelineTitleText');
     const timelineMaxText = document.getElementById('timelineMaxText');
     if (timelineTitleText) timelineTitleText.innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
@@ -231,19 +239,14 @@ function updateBalanceDisplay() {
     if (remainingText) remainingText.innerText = `Remaining: $${remaining}`;
 }
 
-// Monetag Vignette Ad Integration Function
+// Adsterra Smart Link Action (Old Monetag Vignette code removed)
 window.watchAdAction = function(adTitle) {
-    // Monetag Vignette script dynamically load කිරීම
-    const script = document.createElement('script');
-    script.dataset.zone = '11825528';
-    script.src = 'https://n6wxm.com/vignette.min.js';
-    document.body.appendChild(script);
+    window.openSmartLink();
 
-    // User ගේ ගිණුමට මුදල් එකතු වීම සහ Balance එක update කිරීම
     userBalance += 0.00010;
     updateBalanceDisplay();
-    
-    alert(`"${adTitle}" සක්‍රිය විය! $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
+
+    alert(`"${adTitle}" සක්‍රිය විය! Smart Link (${ADSTERRA_SMART_LINK_ID}) විවෘත වූ අතර $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
 };
 
 window.selectPaymentMethod = function(method) {
@@ -350,14 +353,14 @@ window.postComment = function() {
     if (commentInput) commentInput.value = '';
 };
 
-window.openEmailModal = function() { 
+window.openEmailModal = function() {
     const modal = document.getElementById('emailAuthModal');
-    if (modal) modal.style.display = 'flex'; 
+    if (modal) modal.style.display = 'flex';
 };
 
-window.closeAuthModal = function() { 
+window.closeAuthModal = function() {
     const modal = document.getElementById('emailAuthModal');
-    if (modal) modal.style.display = 'none'; 
+    if (modal) modal.style.display = 'none';
 };
 
 window.sendOTPCode = function() {
@@ -397,7 +400,7 @@ function initDashboard(email) {
     const appScreen = document.getElementById('appScreen');
     if (loginScreen) loginScreen.style.display = 'none';
     if (appScreen) appScreen.style.display = 'flex';
-    
+
     const displayUserEmail = document.getElementById('displayUserEmail');
     const accEmail = document.getElementById('accEmail');
     if (displayUserEmail) displayUserEmail.innerText = email;
@@ -434,9 +437,9 @@ window.logout = function() {
     if (loginScreen) loginScreen.style.display = 'flex';
 };
 
-window.toggleFab = function() { 
+window.toggleFab = function() {
     const fab = document.getElementById('fabContainer');
-    if (fab) fab.classList.toggle('active'); 
+    if (fab) fab.classList.toggle('active');
 };
 
 window.switchMainView = function(view) {
@@ -506,7 +509,7 @@ function renderVideoCards(videos, targetElem, playlistContextId) {
     videos.forEach(vid => {
         const card = document.createElement('div');
         card.className = 'video-container animated-box-frame';
-        
+
         let deleteButtonHTML = '';
         if (isAdminLoggedIn) {
             const vidIdentifier = vid.firebaseId || vid.id;
@@ -558,29 +561,29 @@ window.addVideo = async function() {
     const linkInputEl = document.getElementById('ytLinkInput');
     const targetPlId = targetPlEl ? targetPlEl.value : 'none';
     const linkInput = linkInputEl ? linkInputEl.value.trim() : "";
-    
+
     const titleInputElem = document.getElementById('customTitle');
     const descInputElem = document.getElementById('customDesc');
 
     let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Exclusive Video";
     let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
 
-    if (!linkInput) { 
-        alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!"); 
-        return; 
+    if (!linkInput) {
+        alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!");
+        return;
     }
 
     const videoId = extractVideoID(linkInput);
-    if (!videoId || videoId.length !== 11) { 
-        alert("නිවැරදි YouTube Video Link එකක් ඇතුළත් කරන්න!"); 
-        return; 
+    if (!videoId || videoId.length !== 11) {
+        alert("නිවැරදි YouTube Video Link එකක් ඇතුළත් කරන්න!");
+        return;
     }
 
-    const newVidObj = { 
-        firebaseId: 'vid_' + Date.now(), 
-        id: videoId, 
-        title: title, 
-        description: description 
+    const newVidObj = {
+        firebaseId: 'vid_' + Date.now(),
+        id: videoId,
+        title: title,
+        description: description
     };
 
     try {
@@ -591,9 +594,9 @@ window.addVideo = async function() {
             nextSingleVideos.unshift(newVidObj);
         } else {
             const targetPl = nextPlaylistsData.find(pl => pl.id === targetPlId);
-            if (!targetPl) { 
-                alert("Selected playlist එක හමු වුණේ නැහැ."); 
-                return; 
+            if (!targetPl) {
+                alert("Selected playlist එක හමු වුණේ නැහැ.");
+                return;
             }
             targetPl.videos.unshift(newVidObj);
         }
@@ -605,11 +608,11 @@ window.addVideo = async function() {
         localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
 
         closeAdminModals();
-        
+
         if (linkInputEl) linkInputEl.value = '';
         if (titleInputElem) titleInputElem.value = '';
         if (descInputElem) descInputElem.value = '';
-        
+
         render();
         alert("Video එක, Title එක සහ Description එක සාර්ථකව Save විය!");
     } catch (e) {
@@ -648,10 +651,10 @@ window.removeVideo = async function(playlistId, videoFirebaseId) {
     }
 };
 
-window.openPlaylistModal = function() { 
-    toggleFab(); 
+window.openPlaylistModal = function() {
+    toggleFab();
     const modal = document.getElementById('playlistModal');
-    if (modal) modal.style.display = 'flex'; 
+    if (modal) modal.style.display = 'flex';
 };
 
 window.openVideoModal = function() {
