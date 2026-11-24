@@ -47,11 +47,15 @@ window.triggerFacebookLogin = function() {
         .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
 };
 
-const googleLoginBtn = document.getElementById('googleLoginBtn');
-if (googleLoginBtn) googleLoginBtn.addEventListener('click', window.triggerGoogleLogin);
+function bindAuthButtons() {
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+    if (googleLoginBtn) googleLoginBtn.onclick = window.triggerGoogleLogin;
+    if (facebookLoginBtn) facebookLoginBtn.onclick = window.triggerFacebookLogin;
+}
 
-const facebookLoginBtn = document.getElementById('facebookLoginBtn');
-if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', window.triggerFacebookLogin);
+bindAuthButtons();
+window.addEventListener('DOMContentLoaded', bindAuthButtons);
 
 // Firestore Data Fetching & Saving (Fixed)
 window.cloudFetchData = async function() {
