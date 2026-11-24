@@ -9,11 +9,25 @@
     
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Monetag Script (Zone 314921) -->
+    <script src="https://quge5.com/88/tag.min.js" data-zone="314921" async data-cfasync="false"></script>
     
     <!-- External CSS -->
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <!-- Safe Fallback Handlers Before Module Loads -->
+    <script>
+        window.openEmailModal = window.openEmailModal || function () {
+            const modal = document.getElementById('emailAuthModal');
+            if (modal) modal.style.display = 'flex';
+        };
+        window.closeAuthModal = window.closeAuthModal || function () {
+            const modal = document.getElementById('emailAuthModal');
+            if (modal) modal.style.display = 'none';
+        };
+    </script>
 
     <!-- ================================================================= -->
     <!-- SECTION 1: LOGIN / SIGN IN PAGE -->
