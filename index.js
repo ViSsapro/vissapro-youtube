@@ -1,399 +1,685 @@
-<!DOCTYPE html>
-<html lang="si">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VissaPro - E-Money Hub & Portal</title>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- External CSS -->
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <!-- ================================================================= -->
-    <!-- SECTION 1: LOGIN / SIGN IN PAGE -->
-    <!-- ================================================================= -->
-    <div class="login-wrapper" id="loginScreen">
-        <div class="login-card animated-box-frame">
-            <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="login-profile-img">
-            <h2><span>VissaPro</span> Hub</h2>
-            <p class="desc">වීඩියෝ නැරඹීමට හෝ E-Money Portal එකට පිවිසීමට Log in වන්න.</p>
+const firebaseConfig = {
+    apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
+    authDomain: "vissapro-aa91d.firebaseapp.com",
+    projectId: "vissapro-aa91d",
+    storageBucket: "vissapro-aa91d.firebasestorage.app",
+    messagingSenderId: "866553327331",
+    appId: "1:866553327331:web:60ef47fa0c88a942571fd6"
+};
 
-            <div class="auth-btn-group">
-                <button class="auth-btn btn-google" id="googleLoginBtn">
-                    <i class="fa-brands fa-google" style="color: #ea4335;"></i> Sign in with Google
-                </button>
-                <button class="auth-btn btn-facebook" id="facebookLoginBtn">
-                    <i class="fa-brands fa-facebook-f"></i> Sign in with Facebook
-                </button>
-                <button class="auth-btn btn-email" onclick="openEmailModal()">
-                    <i class="fa-solid fa-envelope"></i> Email Verification Sign In
-                </button>
-            </div>
-        </div>
-    </div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    <!-- Modal: Email Request & OTP Verification -->
-    <div class="modal" id="emailAuthModal">
-        <div class="modal-content animated-box-frame">
-            <h3 id="emailModalTitle">Email Sign In</h3>
-            <p id="emailModalDesc">ඔබගේ Email එක ඇතුළත් කර Verification Code (OTP) එක ලබාගන්න.</p>
+// Adsterra Smart Link Configuration
+const ADSTERRA_SMART_LINK_ID = "32448041";
+const ADSTERRA_SMART_LINK_URL = "https://asiafilm.org/4/e875e6d20cac06112cea6ce10ce02bd7";
 
-            <div id="otpStep1">
-                <input type="email" id="userEmailInput" placeholder="example@gmail.com">
-                <div class="modal-buttons">
-                    <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
-                    <button class="btn-submit" onclick="sendOTPCode()">Get Verification Code</button>
+window.openSmartLink = function() {
+    window.open(ADSTERRA_SMART_LINK_URL, "_blank", "noopener,noreferrer");
+};
+
+// Register Service Worker (sw.js)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then((reg) => console.log('Service Worker registered:', reg.scope))
+            .catch((err) => console.log('Service Worker registration failed:', err));
+    });
+}
+
+// Global functions attachment for HTML button triggers
+window.triggerGoogleLogin = function() {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+        .then((res) => { loginSuccess(res.user.email); })
+        .catch((err) => { alert("Google Sign-In Error: " + err.message); });
+};
+
+window.triggerFacebookLogin = function() {
+    const provider = new FacebookAuthProvider();
+    signInWithPopup(auth, provider)
+        .then((res) => { loginSuccess(res.user.email || "facebook_user@vissapro.com"); })
+        .catch((err) => { alert("Facebook Sign-In Error: " + err.message); });
+};
+
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+if (googleLoginBtn) googleLoginBtn.addEventListener('click', window.triggerGoogleLogin);
+
+const facebookLoginBtn = document.getElementById('facebookLoginBtn');
+if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', window.triggerFacebookLogin);
+
+// Firestore Data Fetching & Saving (Fixed)
+window.cloudFetchData = async function() {
+    try {
+        const singleDocRef = doc(db, "appData", "singleVideosDoc");
+        const singleDocSnap = await getDoc(singleDocRef);
+
+        let sVideos = [];
+        if (singleDocSnap.exists()) {
+            const data = singleDocSnap.data();
+            if (Array.isArray(data.videos)) {
+                sVideos = data.videos;
+            } else if (Array.isArray(data.singleVideos)) {
+                sVideos = data.singleVideos;
+            }
+        }
+
+        const plSnap = await getDocs(collection(db, "playlists"));
+        const pData = [];
+
+        plSnap.forEach(d => {
+            const data = d.data();
+            pData.push({
+                id: data.id || d.id,
+                name: data.name || "Untitled Playlist",
+                videos: Array.isArray(data.videos) ? data.videos : []
+            });
+        });
+
+        return { singleVideos: sVideos, playlistsData: pData };
+    } catch (e) {
+        console.error("Firestore Fetch Error:", e);
+        return { singleVideos: [], playlistsData: [] };
+    }
+};
+
+window.cloudAddPlaylistToDB = async function(plObj) {
+    try {
+        await setDoc(doc(db, "playlists", plObj.id), {
+            ...plObj,
+            videos: Array.isArray(plObj.videos) ? plObj.videos : []
+        });
+        return true;
+    } catch (e) {
+        console.error("Add Playlist Error:", e);
+        throw e;
+    }
+};
+
+window.cloudAddVideoToDB = async function(targetPlId, newVidObj, singleVideosArr, playlistsArr) {
+    try {
+        if (targetPlId === 'none') {
+            await setDoc(doc(db, "appData", "singleVideosDoc"), {
+                videos: Array.isArray(singleVideosArr) ? singleVideosArr : []
+            });
+        } else {
+            const targetPl = (playlistsArr || []).find(p => p.id === targetPlId);
+            if (!targetPl) throw new Error("Selected playlist was not found.");
+
+            await setDoc(doc(db, "playlists", targetPl.id), {
+                ...targetPl,
+                videos: Array.isArray(targetPl.videos) ? targetPl.videos : []
+            });
+        }
+        return true;
+    } catch (e) {
+        console.error("Add Video Error:", e);
+        throw e;
+    }
+};
+
+window.cloudUpdateDatabase = async function(singleVideosArr, playlistsArr) {
+    try {
+        await setDoc(doc(db, "appData", "singleVideosDoc"), {
+            videos: Array.isArray(singleVideosArr) ? singleVideosArr : []
+        });
+
+        for (const pl of playlistsArr) {
+            await setDoc(doc(db, "playlists", pl.id), {
+                id: pl.id,
+                name: pl.name,
+                videos: Array.isArray(pl.videos) ? pl.videos : []
+            });
+        }
+        return true;
+    } catch (e) {
+        console.error("Cloud Update Error:", e);
+        throw e;
+    }
+};
+
+// Initialize App on load
+window.onload = async function() {
+    const loggedUser = localStorage.getItem('vissaLoggedUser');
+    if (loggedUser) {
+        await loadCloudData();
+        initDashboard(loggedUser);
+    }
+};
+
+// EmailJS Init
+(function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
+
+const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com";
+
+const LIMITS = {
+    paypal: 3.00,
+    binance: 4.50,
+    bank: 6.50
+};
+
+let generatedOTP = null;
+let pendingEmail = "";
+let userBalance = parseFloat(localStorage.getItem('vissaUserBalance')) || 0.00000;
+let selectedPaymentMethod = 'paypal';
+
+let singleVideos = [];
+let playlistsData = [];
+let currentView = 'videos';
+let selectedPlaylistId = null;
+let isAdminLoggedIn = false;
+
+async function loadCloudData() {
+    if (!window.cloudFetchData) return false;
+    try {
+        const dbRes = await window.cloudFetchData();
+        singleVideos = Array.isArray(dbRes.singleVideos) ? dbRes.singleVideos : [];
+        playlistsData = Array.isArray(dbRes.playlistsData) ? dbRes.playlistsData : [];
+        localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
+        return true;
+    } catch (e) {
+        console.error("loadCloudData Error:", e);
+        return false;
+    }
+}
+
+// Fixed: Attached to window to prevent undefined errors in HTML onclick
+window.toggleSideMenu = function() {
+    const drawer = document.getElementById('sideDrawer');
+    const overlay = document.getElementById('menuOverlay');
+    if (drawer && overlay) {
+        drawer.classList.toggle('open');
+        overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
+    }
+};
+
+// Fixed: Attached to window to handle page switching properly
+window.switchPageView = function(page) {
+    document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
+    document.querySelectorAll('.drawer-nav-item button').forEach(b => b.classList.remove('active'));
+
+    const targetMap = {
+        'home': 'viewHome',
+        'makemoney': 'viewMakeMoney',
+        'paymentDetails': 'viewPaymentDetails',
+        'comments': 'viewComments',
+        'account': 'viewAccount'
+    };
+
+    const targetView = document.getElementById(targetMap[page]);
+    if (targetView) targetView.classList.add('active-view');
+
+    const navBtn = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
+    if (navBtn) navBtn.classList.add('active');
+
+    window.toggleSideMenu();
+};
+
+function updateBalanceDisplay() {
+    localStorage.setItem('vissaUserBalance', userBalance.toFixed(5));
+
+    const formatted = '$' + userBalance.toFixed(5);
+    const accBalanceEl = document.getElementById('accBalance');
+    const withdrawDisplayBalanceEl = document.getElementById('withdrawDisplayBalance');
+    if (accBalanceEl) accBalanceEl.innerText = formatted;
+    if (withdrawDisplayBalanceEl) withdrawDisplayBalanceEl.innerText = formatted;
+
+    const currentLimit = LIMITS[selectedPaymentMethod];
+    const methodNameCap = selectedPaymentMethod.charAt(0).toUpperCase() + selectedPaymentMethod.slice(1);
+
+    const timelineTitleText = document.getElementById('timelineTitleText');
+    const timelineMaxText = document.getElementById('timelineMaxText');
+    if (timelineTitleText) timelineTitleText.innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
+    if (timelineMaxText) timelineMaxText.innerText = `$${currentLimit.toFixed(2)}`;
+
+    const percent = Math.min((userBalance / currentLimit) * 100, 100).toFixed(2);
+    const timelinePercent = document.getElementById('timelinePercent');
+    const timelineBarFill = document.getElementById('timelineBarFill');
+    if (timelinePercent) timelinePercent.innerText = percent + '%';
+    if (timelineBarFill) timelineBarFill.style.width = percent + '%';
+
+    const remaining = Math.max(0, currentLimit - userBalance).toFixed(5);
+    const remainingText = document.getElementById('remainingText');
+    if (remainingText) remainingText.innerText = `Remaining: $${remaining}`;
+}
+
+// Adsterra Smart Link Action
+window.watchAdAction = function(adTitle) {
+    window.openSmartLink();
+
+    userBalance += 0.00010;
+    updateBalanceDisplay();
+
+    alert(`"${adTitle}" සක්‍රිය විය! Smart Link (${ADSTERRA_SMART_LINK_ID}) විවෘත වූ අතර $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
+};
+
+window.selectPaymentMethod = function(method) {
+    selectedPaymentMethod = method;
+    document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.method-form').forEach(f => f.classList.remove('active'));
+
+    if (method === 'paypal') {
+        const btn = document.getElementById('btnMethodPaypal');
+        const form = document.getElementById('formPaypal');
+        if (btn) btn.classList.add('active');
+        if (form) form.classList.add('active');
+    } else if (method === 'binance') {
+        const btn = document.getElementById('btnMethodBinance');
+        const form = document.getElementById('formBinance');
+        if (btn) btn.classList.add('active');
+        if (form) form.classList.add('active');
+    } else if (method === 'bank') {
+        const btn = document.getElementById('btnMethodBank');
+        const form = document.getElementById('formBank');
+        if (btn) btn.classList.add('active');
+        if (form) form.classList.add('active');
+    }
+
+    updateBalanceDisplay();
+};
+
+window.requestWithdrawal = function() {
+    const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
+    const amountInput = document.getElementById('wAmount');
+    const amount = amountInput ? amountInput.value.trim() : "";
+    const minLimit = LIMITS[selectedPaymentMethod];
+    let detailsText = "";
+
+    if (userBalance < minLimit) {
+        const rem = (minLimit - userBalance).toFixed(5);
+        alert(`Withdraw කිරීමට නොහැක!\n\n${selectedPaymentMethod.toUpperCase()} සඳහා අවම Withdrawal limit එක $${minLimit.toFixed(2)} කි.\nඔබට තව $${rem} ක් ලබා ගැනීමට අවශ්‍යයි.`);
+        return;
+    }
+
+    if (!amount || parseFloat(amount) <= 0) {
+        alert('කරුණාකර Withdraw කිරීමට අවශ්‍ය ඩොලර් ගණන ඇතුළත් කරන්න!');
+        return;
+    }
+
+    if (parseFloat(amount) > userBalance) {
+        alert('ඔබගේ Total Balance එකට වඩා වැඩි මුදලක් Withdraw කිරීමට නොහැක!');
+        return;
+    }
+
+    if (selectedPaymentMethod === 'paypal') {
+        const ppEmailEl = document.getElementById('wPaypalEmail');
+        const ppEmail = ppEmailEl ? ppEmailEl.value.trim() : "";
+        if (!ppEmail) { alert('කරුණාකර PayPal Email එක ඇතුළත් කරන්න!'); return; }
+        detailsText = `Method: PayPal\nPayPal Email: ${ppEmail}`;
+    } else if (selectedPaymentMethod === 'binance') {
+        const bIdEl = document.getElementById('wBinanceId');
+        const bId = bIdEl ? bIdEl.value.trim() : "";
+        if (!bId) { alert('කරුණාකර Binance Pay ID හෝ Address එක ඇතුළත් කරන්න!'); return; }
+        detailsText = `Method: Binance\nBinance Pay ID/Address: ${bId}`;
+    } else if (selectedPaymentMethod === 'bank') {
+        const bankEl = document.getElementById('wBankName');
+        const accEl = document.getElementById('wAccNumber');
+        const branchEl = document.getElementById('wBranch');
+        const nameEl = document.getElementById('wAccName');
+        const bank = bankEl ? bankEl.value.trim() : "";
+        const acc = accEl ? accEl.value.trim() : "";
+        const branch = branchEl ? branchEl.value.trim() : "";
+        const name = nameEl ? nameEl.value.trim() : "";
+        if (!bank || !acc || !branch || !name) { alert('කරුණාකර සියලුම බැංකු තොරතුරු ඇතුළත් කරන්න!'); return; }
+        detailsText = `Method: Bank Transfer\nBank: ${bank}\nAcc No: ${acc}\nBranch: ${branch}\nName: ${name}`;
+    }
+
+    const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nCurrent User Total Balance: $${userBalance.toFixed(5)}\nRequired Threshold Passed: $${minLimit.toFixed(2)}\n\n--- Withdrawal Details ---\n${detailsText}`;
+
+    emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: MY_ADMIN_GMAIL, passcode: withdrawMessage })
+        .then(function() {
+            alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
+            userBalance -= parseFloat(amount);
+            updateBalanceDisplay();
+            if (amountInput) amountInput.value = '';
+        }, function(error) {
+            alert('යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
+        });
+};
+
+window.postComment = function() {
+    const commentInput = document.getElementById('newCommentText');
+    const text = commentInput ? commentInput.value.trim() : "";
+    const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
+
+    if (!text) { alert('කරුණාකර Comment එකක් ලියන්න!'); return; }
+
+    const list = document.getElementById('commentsList');
+    if (list) {
+        const newComment = document.createElement('div');
+        newComment.style = "background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;";
+        newComment.innerHTML = `
+            <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">${loggedUser}</div>
+            <div style="font-size:0.95rem; color:#ddd;">${text}</div>
+        `;
+        list.prepend(newComment);
+    }
+    if (commentInput) commentInput.value = '';
+};
+
+window.openEmailModal = function() {
+    const modal = document.getElementById('emailAuthModal');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeAuthModal = function() {
+    const modal = document.getElementById('emailAuthModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.sendOTPCode = function() {
+    const emailInput = document.getElementById('userEmailInput');
+    const userEmail = emailInput ? emailInput.value.trim() : "";
+    if (!userEmail || !userEmail.includes('@')) { alert('කරුණාකර නිවැරදි Email එකක් ඇතුළත් කරන්න!'); return; }
+
+    pendingEmail = userEmail;
+    generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+    emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: userEmail, passcode: generatedOTP })
+        .then(function() {
+            alert(`Verification Code එක ${userEmail} වෙත යවන ලදී.`);
+            const step1 = document.getElementById('otpStep1');
+            const step2 = document.getElementById('otpStep2');
+            if (step1) step1.style.display = 'none';
+            if (step2) step2.style.display = 'block';
+        }, function(err) { alert('දෝෂයක් සිදු විය: ' + JSON.stringify(err)); });
+};
+
+window.verifyOTPCode = function() {
+    const otpInput = document.getElementById('otpInput');
+    if (otpInput && otpInput.value.trim() === generatedOTP) {
+        closeAuthModal();
+        loginSuccess(pendingEmail);
+    } else { alert('වැරදි Verification Code එකකි!'); }
+};
+
+async function loginSuccess(email) {
+    localStorage.setItem('vissaLoggedUser', email);
+    await loadCloudData();
+    initDashboard(email);
+}
+
+function initDashboard(email) {
+    const loginScreen = document.getElementById('loginScreen');
+    const appScreen = document.getElementById('appScreen');
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (appScreen) appScreen.style.display = 'flex';
+
+    const displayUserEmail = document.getElementById('displayUserEmail');
+    const accEmail = document.getElementById('accEmail');
+    if (displayUserEmail) displayUserEmail.innerText = email;
+    if (accEmail) accEmail.innerText = email;
+
+    const roleElem = document.getElementById('displayUserRole');
+    const fabElem = document.getElementById('fabContainer');
+
+    if (email.toLowerCase() === MY_ADMIN_GMAIL.toLowerCase()) {
+        if (roleElem) {
+            roleElem.innerText = "Admin (Creator)";
+            roleElem.className = "badge-role admin";
+        }
+        if (fabElem) fabElem.style.display = "flex";
+        isAdminLoggedIn = true;
+    } else {
+        if (roleElem) {
+            roleElem.innerText = "Viewer";
+            roleElem.className = "badge-role";
+        }
+        if (fabElem) fabElem.style.display = "none";
+        isAdminLoggedIn = false;
+    }
+
+    updateBalanceDisplay();
+    render();
+}
+
+window.logout = function() {
+    localStorage.removeItem('vissaLoggedUser');
+    const appScreen = document.getElementById('appScreen');
+    const loginScreen = document.getElementById('loginScreen');
+    if (appScreen) appScreen.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'flex';
+};
+
+window.toggleFab = function() {
+    const fab = document.getElementById('fabContainer');
+    if (fab) fab.classList.toggle('active');
+};
+
+window.switchMainView = function(view) {
+    currentView = view;
+    selectedPlaylistId = null;
+    const tabVideos = document.getElementById('tabAllVideosBtn');
+    const tabPlaylists = document.getElementById('tabPlaylistsBtn');
+    if (tabVideos) tabVideos.classList.toggle('active', view === 'videos');
+    if (tabPlaylists) tabPlaylists.classList.toggle('active', view === 'playlists');
+    render();
+};
+
+function render() {
+    const container = document.getElementById('mainContent');
+    const subTabs = document.getElementById('playlistSubTabs');
+    if (!container) return;
+    container.innerHTML = '';
+    if (subTabs) subTabs.style.display = 'none';
+
+    if (currentView === 'videos') {
+        let allCombined = [...singleVideos];
+        playlistsData.forEach(pl => { allCombined = allCombined.concat(pl.videos); });
+        if (allCombined.length === 0) {
+            container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් වීඩියෝ නොමැත.</p>';
+            return;
+        }
+        renderVideoCards(allCombined, container, 'none');
+    } else if (currentView === 'playlists') {
+        if (selectedPlaylistId === null) {
+            if (playlistsData.length === 0) {
+                container.innerHTML = '<p style="color:#888; text-align:center; padding:40px;">තවමත් Playlists නොමැත.</p>';
+                return;
+            }
+            const grid = document.createElement('div');
+            grid.className = 'playlist-grid';
+            playlistsData.forEach(pl => {
+                const card = document.createElement('div');
+                card.className = 'playlist-card animated-box-frame';
+                card.onclick = () => { selectedPlaylistId = pl.id; render(); };
+                card.innerHTML = `<i class="fa-solid fa-layer-group"></i><h3>${pl.name}</h3><span style="color:#777; font-size:0.85rem;">${pl.videos.length} Videos</span>`;
+                grid.appendChild(card);
+            });
+            container.appendChild(grid);
+        } else {
+            if (subTabs) subTabs.style.display = 'flex';
+            renderSubTabs();
+            const currentPl = playlistsData.find(pl => pl.id === selectedPlaylistId);
+            if (currentPl) renderVideoCards(currentPl.videos, container, currentPl.id);
+        }
+    }
+}
+
+function renderSubTabs() {
+    const subTabs = document.getElementById('playlistSubTabs');
+    if (!subTabs) return;
+    subTabs.innerHTML = '<button class="sub-tab-btn animated-box-frame" onclick="selectedPlaylistId=null;render();"><i class="fa-solid fa-arrow-left"></i> All Playlists</button>';
+    playlistsData.forEach(pl => {
+        const btn = document.createElement('button');
+        btn.className = `sub-tab-btn animated-box-frame ${pl.id === selectedPlaylistId ? 'active' : ''}`;
+        btn.innerText = pl.name;
+        btn.onclick = () => { selectedPlaylistId = pl.id; render(); };
+        subTabs.appendChild(btn);
+    });
+}
+
+function renderVideoCards(videos, targetElem, playlistContextId) {
+    videos.forEach(vid => {
+        const card = document.createElement('div');
+        card.className = 'video-container animated-box-frame';
+
+        let deleteButtonHTML = '';
+        if (isAdminLoggedIn) {
+            const vidIdentifier = vid.firebaseId || vid.id;
+            deleteButtonHTML = `<button onclick="removeVideo('${playlistContextId}', '${vidIdentifier}')" style="background: #ff4d4d; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold;"><i class="fa-solid fa-trash"></i> Delete Video</button>`;
+        }
+
+        card.innerHTML = `
+            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${vid.id}" allowfullscreen></iframe></div>
+            <div class="video-details">
+                <h2 class="video-title">${vid.title}</h2>
+                <div class="video-description">${vid.description}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="yt-btn"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+                    ${deleteButtonHTML}
                 </div>
             </div>
+        `;
+        targetElem.appendChild(card);
+    });
+}
 
-            <div id="otpStep2" style="display: none;">
-                <input type="text" id="otpInput" placeholder="Enter 6-digit Code (e.g. 123456)">
-                <div class="modal-buttons">
-                    <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
-                    <button class="btn-submit" onclick="verifyOTPCode()">Verify & Sign In</button>
-                </div>
-            </div>
-        </div>
-    </div>
+window.addPlaylist = async function() {
+    const nameInput = document.getElementById('playlistNameInput');
+    const name = nameInput ? nameInput.value.trim() : "";
+    if (!name) { alert("කරුණාකර Playlist Name එකක් ඇතුළත් කරන්න!"); return; }
 
-    <!-- ================================================================= -->
-    <!-- SECTION 2: MAIN APP DASHBOARD WITH SIDE MENU -->
-    <!-- ================================================================= -->
-    <div class="app-wrapper" id="appScreen">
-        
-        <!-- Top Navbar -->
-        <div class="top-navbar animated-box-frame" style="border-radius: 30px;">
-            <div class="user-badge">
-                <i class="fa-solid fa-user-circle"></i>
-                <span id="displayUserEmail">user@gmail.com</span>
-                <span id="displayUserRole" class="badge-role">Viewer</span>
-            </div>
+    const newPl = { id: 'pl_' + Date.now(), name: name, videos: [] };
 
-            <div class="nav-right-actions">
-                <button class="menu-hamburger-btn" onclick="toggleSideMenu()">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-        </div>
+    try {
+        await window.cloudAddPlaylistToDB(newPl);
+        playlistsData.push(newPl);
+        closeAdminModals();
+        if (nameInput) nameInput.value = '';
+        switchMainView('playlists');
+        alert("Playlist එක සාර්ථකව සාදන ලදී.");
+    } catch (e) {
+        alert("Playlist save කිරීමට නොහැකි විය: " + e.message);
+    }
+};
 
-        <!-- RIGHT SIDE NAVIGATION DRAWER MENU -->
-        <div class="side-menu-overlay" id="menuOverlay" onclick="toggleSideMenu()"></div>
-        <div class="side-menu-drawer" id="sideDrawer">
-            <div class="drawer-header">
-                <h3>VissaPro Menu</h3>
-                <button class="close-drawer-btn" onclick="toggleSideMenu()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <ul class="drawer-nav-list">
-                <li class="drawer-nav-item">
-                    <button id="navHome" class="active" onclick="switchPageView('home')">
-                        <i class="fa-solid fa-house"></i> Home (Videos)
-                    </button>
-                </li>
-                <li class="drawer-nav-item">
-                    <button id="navMakeMoney" class="highlight-green" onclick="switchPageView('makemoney')">
-                        <i class="fa-solid fa-sack-dollar" style="color:#000;"></i> Make Money
-                    </button>
-                </li>
-                <li class="drawer-nav-item">
-                    <button id="navPaymentDetails" onclick="switchPageView('paymentDetails')">
-                        <i class="fa-solid fa-wallet"></i> Payment Details / Withdraw
-                    </button>
-                </li>
-                <li class="drawer-nav-item">
-                    <button id="navComments" onclick="switchPageView('comments')">
-                        <i class="fa-solid fa-comments"></i> Your Comments
-                    </button>
-                </li>
-                <li class="drawer-nav-item">
-                    <button id="navAccount" onclick="switchPageView('account')">
-                        <i class="fa-solid fa-user-gear"></i> Your Account
-                    </button>
-                </li>
-                <li class="drawer-nav-item" style="margin-top: 20px;">
-                    <button onclick="logout()" style="color: #ff5252;">
-                        <i class="fa-solid fa-right-from-bracket" style="color: #ff5252;"></i> Logout
-                    </button>
-                </li>
-            </ul>
-        </div>
+function extractVideoID(url) {
+    let cleanUrl = url.split('?')[0].split('&')[0];
+    const match = cleanUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
 
-        <!-- VIEW 1: HOME PAGE -->
-        <div id="viewHome" class="page-view active-view">
-            <header>
-                <img src="https://i.ibb.co/Ps9fcCGK/channels4-profile.jpg" alt="VissaPro Profile" class="profile-img">
-                <h1>Welcome to <span>VissaPro</span> Hub</h1>
-                <p style="color:#aaa;">ඔබට අවශ්‍ය E-Money වීඩියෝ සහ Playlists මෙතැනින් බලන්න!</p>
-            </header>
+window.addVideo = async function() {
+    const targetPlEl = document.getElementById('playlistSelect');
+    const linkInputEl = document.getElementById('ytLinkInput');
+    const targetPlId = targetPlEl ? targetPlEl.value : 'none';
+    const linkInput = linkInputEl ? linkInputEl.value.trim() : "";
 
-            <div class="main-tabs-container">
-                <button class="main-tab-btn active animated-box-frame" style="border-radius: 25px;" id="tabAllVideosBtn" onclick="switchMainView('videos')">
-                    <i class="fa-solid fa-play"></i> All Videos
-                </button>
-                <button class="main-tab-btn animated-box-frame" style="border-radius: 25px;" id="tabPlaylistsBtn" onclick="switchMainView('playlists')">
-                    <i class="fa-solid fa-folder-open"></i> All Playlists
-                </button>
-            </div>
+    const titleInputElem = document.getElementById('customTitle');
+    const descInputElem = document.getElementById('customDesc');
 
-            <div class="sub-tabs-container" id="playlistSubTabs"></div>
-            <div class="content-container" id="mainContent"></div>
-        </div>
+    let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Exclusive Video";
+    let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
 
-        <!-- VIEW 2: MAKE MONEY PAGE -->
-        <div id="viewMakeMoney" class="page-view">
-            <div class="earn-container animated-box-frame">
-                <div class="earn-banner">
-                    <h2><i class="fa-solid fa-coins"></i> Watch Ads & Earn Money</h2>
-                    <p>පහත Ad Buttons ක්ලික් කර නැරඹීමෙන් ඔබගේ Balance එකට $0.00010 බැගින් එකතු කරගන්න!</p>
-                </div>
+    if (!linkInput) {
+        alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!");
+        return;
+    }
 
-                <!-- Adsterra Smart Link Direct Box (ID: 32448041) -->
-                <div class="smart-link-box animated-box-frame">
-                    <p style="color:#ccc; font-size:0.9rem; margin-bottom:10px;">
-                        Adsterra Smart Link (ID: <strong>32448041</strong>)
-                    </p>
-                    <a href="https://asiafilm.org/4/e875e6d20cac06112cea6ce10ce02bd7" target="_blank" rel="noopener noreferrer" class="btn-watch-ad" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; max-width:260px;">
-                        <i class="fa-solid fa-up-right-from-square"></i> Open Smart Link
-                    </a>
-                </div>
+    const videoId = extractVideoID(linkInput);
+    if (!videoId || videoId.length !== 11) {
+        alert("නිවැරදි YouTube Video Link එකක් ඇතුළත් කරන්න!");
+        return;
+    }
 
-                <div class="ad-cards-grid">
-                    <!-- Ad 1 -->
-                    <div class="ad-card animated-box-frame">
-                        <div>
-                            <span class="ad-badge">Reward: $0.00010</span>
-                            <div class="ad-title">Ad Task 1</div>
-                            <div class="ad-desc">ඇඩ් එක නරඹා $0.00010 ක් ඔබගේ ගිණුමට එකතු කරගන්න.</div>
-                        </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Ad Task 1')">
-                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
-                        </button>
-                    </div>
+    const newVidObj = {
+        firebaseId: 'vid_' + Date.now(),
+        id: videoId,
+        title: title,
+        description: description
+    };
 
-                    <!-- Ad 2 -->
-                    <div class="ad-card animated-box-frame">
-                        <div>
-                            <span class="ad-badge">Reward: $0.00010</span>
-                            <div class="ad-title">Ad Task 2</div>
-                            <div class="ad-desc">විශේෂ ඇඩ් එක නරඹා සාර්ථකව Reward එක Unlock කරන්න.</div>
-                        </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Ad Task 2')">
-                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
-                        </button>
-                    </div>
+    try {
+        let nextSingleVideos = [...singleVideos];
+        let nextPlaylistsData = playlistsData.map(pl => ({ ...pl, videos: [...pl.videos] }));
 
-                    <!-- Ad 3 -->
-                    <div class="ad-card animated-box-frame">
-                        <div>
-                            <span class="ad-badge">Reward: $0.00010</span>
-                            <div class="ad-title">Ad Task 3</div>
-                            <div class="ad-desc">මෙම ඇඩ් එක ක්ලික් කර $0.00010 ක ගෙවීම් මුදල සක්‍රිය කරගන්න.</div>
-                        </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Ad Task 3')">
-                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
-                        </button>
-                    </div>
+        if (targetPlId === 'none') {
+            nextSingleVideos.unshift(newVidObj);
+        } else {
+            const targetPl = nextPlaylistsData.find(pl => pl.id === targetPlId);
+            if (!targetPl) {
+                alert("Selected playlist එක හමු වුණේ නැහැ.");
+                return;
+            }
+            targetPl.videos.unshift(newVidObj);
+        }
 
-                    <!-- Ad 4 -->
-                    <div class="ad-card animated-box-frame">
-                        <div>
-                            <span class="ad-badge">Reward: $0.00010</span>
-                            <div class="ad-title">Ad Task 4</div>
-                            <div class="ad-desc">තවත් අමතර ඇඩ් එකක් නරඹා අදාළ ත්‍යාගය ලබාගන්න.</div>
-                        </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Ad Task 4')">
-                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
-                        </button>
-                    </div>
+        await window.cloudAddVideoToDB(targetPlId, newVidObj, nextSingleVideos, nextPlaylistsData);
 
-                    <!-- Ad 5 -->
-                    <div class="ad-card animated-box-frame">
-                        <div>
-                            <span class="ad-badge">Reward: $0.00010</span>
-                            <div class="ad-title">Ad Task 5</div>
-                            <div class="ad-desc">මෙම කාර්යය සම්පූර්ණ කර ගිණුම් ශේෂය වර්ධනය කරගන්න.</div>
-                        </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Ad Task 5')">
-                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
-                        </button>
-                    </div>
+        singleVideos = nextSingleVideos;
+        playlistsData = nextPlaylistsData;
+        localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
 
-                    <!-- Ad 6 -->
-                    <div class="ad-card animated-box-frame">
-                        <div>
-                            <span class="ad-badge">Reward: $0.00010</span>
-                            <div class="ad-title">Ad Task 6</div>
-                            <div class="ad-desc">අවසාන ප්‍රෝ ඇඩ් එක නරඹා උපරිම ප්‍රතිලාභ හිමිකර ගන්න.</div>
-                        </div>
-                        <button class="btn-watch-ad" onclick="watchAdAction('Ad Task 6')">
-                            <i class="fa-solid fa-play-circle"></i> Watch Ad & Earn
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        closeAdminModals();
 
-        <!-- VIEW 3: PAYMENT DETAILS & WITHDRAW PORTAL -->
-        <div id="viewPaymentDetails" class="page-view">
-            <div class="earn-container animated-box-frame">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <i class="fa-solid fa-wallet" style="font-size: 50px; color: #ff0000; margin-bottom: 10px;"></i>
-                    <h2>Payment Details & Withdraw Portal</h2>
-                    <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">තෝරාගත් Method එකේ Target Limit එක සම්පූර්ණ වූ පසු Withdraw Request එක යොමු කරන්න.</p>
-                </div>
+        if (linkInputEl) linkInputEl.value = '';
+        if (titleInputElem) titleInputElem.value = '';
+        if (descInputElem) descInputElem.value = '';
 
-                <div class="balance-badge-box">
-                    <span style="font-size: 0.9rem;">Total Balance:</span>
-                    <h1 id="withdrawDisplayBalance" style="font-size: 2.3rem; margin-top: 5px;">$0.00000</h1>
-                    
-                    <div class="timeline-box">
-                        <div class="timeline-header">
-                            <span id="timelineTitleText">PayPal Goal Progress ($3.00 Target)</span>
-                            <span id="timelinePercent">0.00%</span>
-                        </div>
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill" id="timelineBarFill"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; margin-top: 6px;">
-                            <span>$0.00</span>
-                            <span id="remainingText">Remaining: $3.00</span>
-                            <span id="timelineMaxText">$3.00</span>
-                        </div>
-                    </div>
-                </div>
+        render();
+        alert("Video එක, Title එක සහ Description එක සාර්ථකව Save විය!");
+    } catch (e) {
+        alert("Video save කිරීමට නොහැකි විය: " + e.message);
+    }
+};
 
-                <div class="withdraw-card animated-box-frame">
-                    <h3 style="margin-bottom: 15px; text-align: center;">Select Payment Method</h3>
-                    
-                    <div class="method-tabs">
-                        <button class="method-btn active animated-box-frame" id="btnMethodPaypal" onclick="selectPaymentMethod('paypal')">
-                            <i class="fa-brands fa-paypal" style="color:#003087;"></i> PayPal
-                            <span style="font-size:0.7rem; color:#888;">Limit: $3.00</span>
-                        </button>
-                        <button class="method-btn animated-box-frame" id="btnMethodBinance" onclick="selectPaymentMethod('binance')">
-                            <i class="fa-solid fa-cubes" style="color:#f3ba2f;"></i> Binance
-                            <span style="font-size:0.7rem; color:#888;">Limit: $4.50</span>
-                        </button>
-                        <button class="method-btn animated-box-frame" id="btnMethodBank" onclick="selectPaymentMethod('bank')">
-                            <i class="fa-solid fa-building-columns" style="color:#ff0000;"></i> Bank
-                            <span style="font-size:0.7rem; color:#888;">Limit: $6.50</span>
-                        </button>
-                    </div>
+window.removeVideo = async function(playlistId, videoFirebaseId) {
+    if (!confirm("මෙම වීඩියෝව ඉවත් කිරීමට ඔබට අවශ්‍ය බව විශ්වාසද?")) return;
 
-                    <div id="formPaypal" class="method-form active">
-                        <label style="color: #aaa; font-size: 0.85rem;">PayPal Email Address:</label>
-                        <input type="email" id="wPaypalEmail" placeholder="e.g. yourname@paypal.com">
-                    </div>
+    try {
+        let nextSingleVideos = [...singleVideos];
+        let nextPlaylistsData = playlistsData.map(pl => ({ ...pl, videos: [...pl.videos] }));
 
-                    <div id="formBinance" class="method-form">
-                        <label style="color: #aaa; font-size: 0.85rem;">Binance Pay ID or USDT (BEP20) Address:</label>
-                        <input type="text" id="wBinanceId" placeholder="e.g. 254896321 / 0x123...">
-                    </div>
+        if (playlistId === 'none') {
+            nextSingleVideos = nextSingleVideos.filter(v => v.firebaseId !== videoFirebaseId && v.id !== videoFirebaseId);
+        } else {
+            const targetPl = nextPlaylistsData.find(pl => pl.id === playlistId);
+            if (targetPl) {
+                targetPl.videos = targetPl.videos.filter(v => v.firebaseId !== videoFirebaseId && v.id !== videoFirebaseId);
+            }
+        }
 
-                    <div id="formBank" class="method-form">
-                        <label style="color: #aaa; font-size: 0.85rem;">Bank Name:</label>
-                        <input type="text" id="wBankName" placeholder="e.g. Commercial Bank">
+        if (typeof window.cloudUpdateDatabase === 'function') {
+            await window.cloudUpdateDatabase(nextSingleVideos, nextPlaylistsData);
+        }
 
-                        <label style="color: #aaa; font-size: 0.85rem;">Account Number:</label>
-                        <input type="text" id="wAccNumber" placeholder="e.g. 8010459201">
+        singleVideos = nextSingleVideos;
+        playlistsData = nextPlaylistsData;
+        localStorage.setItem('vissaSingleVideos', JSON.stringify(singleVideos));
 
-                        <label style="color: #aaa; font-size: 0.85rem;">Branch Name:</label>
-                        <input type="text" id="wBranch" placeholder="e.g. Colombo Fort">
+        render();
+        alert("වීඩියෝව සාර්ථකව ඉවත් කරන ලදී!");
+    } catch (e) {
+        alert("වීඩියෝව ඉවත් කිරීම අසාර්ථක විය: " + e.message);
+    }
+};
 
-                        <label style="color: #aaa; font-size: 0.85rem;">Account Holder Name:</label>
-                        <input type="text" id="wAccName" placeholder="e.g. A.B.C. Perera">
-                    </div>
+window.openPlaylistModal = function() {
+    toggleFab();
+    const modal = document.getElementById('playlistModal');
+    if (modal) modal.style.display = 'flex';
+};
 
-                    <label style="color: #aaa; font-size: 0.85rem; margin-top: 5px; display: block;">Withdraw Amount ($):</label>
-                    <input type="number" step="0.00010" id="wAmount" placeholder="0.00010">
+window.openVideoModal = function() {
+    toggleFab();
+    const select = document.getElementById('playlistSelect');
+    if (select) {
+        select.innerHTML = '<option value="none">-- None (Single Video / Direct Upload) --</option>';
+        playlistsData.forEach(pl => { select.innerHTML += `<option value="${pl.id}">${pl.name}</option>`; });
+    }
+    const modal = document.getElementById('videoModal');
+    if (modal) modal.style.display = 'flex';
+};
 
-                    <button class="btn-submit" style="width: 100%; padding: 14px; margin-top: 10px; font-size: 1rem;" onclick="requestWithdrawal()">
-                        <i class="fa-solid fa-paper-plane"></i> Submit Request
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 4: COMMENTS PAGE -->
-        <div id="viewComments" class="page-view">
-            <div class="earn-container animated-box-frame">
-                <h2 style="margin-bottom: 15px;"><i class="fa-solid fa-comments" style="color:#ff0000;"></i> Your Comments & Feedback</h2>
-                
-                <div class="comment-input-group">
-                    <textarea id="newCommentText" placeholder="ඔබගේ අදහස් හෝ ගැටලු මෙතැන සටහන් කරන්න..." style="width:100%; height:90px; background:#111; border:1px solid #444; border-radius:8px; color:#fff; padding:12px; font-size:0.95rem; margin-bottom:10px;"></textarea>
-                    <button class="btn-submit" onclick="postComment()">Post Comment</button>
-                </div>
-
-                <div id="commentsList" style="margin-top:20px;">
-                    <div style="background:#222; border-radius:8px; padding:15px; margin-bottom:12px; border-left:3px solid #ff0000;">
-                        <div style="font-size:0.85rem; color:#ff0000; font-weight:bold; margin-bottom:4px;">Vimukthi Thuhina (Admin)</div>
-                        <div style="font-size:0.95rem; color:#ddd;">සාදරයෙන් පිළිගන්නවා VissaPro E-Money චැනල් එකට! ඕනෑම ගැටලුවක් මෙතනින් අහන්න.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 5: ACCOUNT PAGE -->
-        <div id="viewAccount" class="page-view">
-            <div class="earn-container animated-box-frame" style="text-align: center;">
-                <i class="fa-solid fa-user-astronaut" style="font-size: 60px; color: #ff0000; margin-bottom: 15px;"></i>
-                <h2>Your Account Details</h2>
-                <div style="background: #222; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: left;">
-                    <p style="margin-bottom: 10px;"><strong>Logged Email:</strong> <span id="accEmail">user@gmail.com</span></p>
-                    <p style="margin-bottom: 10px;"><strong>Account Status:</strong> <span style="color:#38ef7d;">Active</span></p>
-                    <p><strong>Total Earnings:</strong> <span id="accBalance" style="color:#38ef7d; font-weight:bold;">$0.00000</span></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Floating Admin (+) Button -->
-        <div class="fab-container" id="fabContainer">
-            <button class="fab-main" onclick="toggleFab()"><i class="fa-solid fa-plus"></i></button>
-            <div class="fab-options">
-                <button class="fab-option-btn animated-box-frame" onclick="openPlaylistModal()">
-                    <i class="fa-solid fa-folder-plus"></i> + Add Playlist
-                </button>
-                <button class="fab-option-btn animated-box-frame" onclick="openVideoModal()">
-                    <i class="fa-solid fa-video"></i> + Add Video
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals for Admin -->
-    <div class="modal" id="playlistModal">
-        <div class="modal-content animated-box-frame">
-            <h3>නව Playlist එකක් සාදන්න</h3>
-            <input type="text" id="playlistNameInput" placeholder="Playlist Name (e.g. Trading Course)">
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeAdminModals()">Cancel</button>
-                <button class="btn-submit" onclick="addPlaylist()">Create Playlist</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="videoModal">
-        <div class="modal-content animated-box-frame">
-            <h3>නව Video එකක් එකතු කරන්න</h3>
-            <select id="playlistSelect">
-                <option value="none">-- None (Single Video / Direct Upload) --</option>
-            </select>
-            <input type="text" id="ytLinkInput" placeholder="YouTube Link (e.g., https://youtu.be/xxx)">
-            <input type="text" id="customTitle" placeholder="Title (Optional)">
-            <textarea id="customDesc" placeholder="Description (Optional)" style="height:70px; resize:none;"></textarea>
-            <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeAdminModals()">Cancel</button>
-                <button class="btn-submit" onclick="addVideo()">Add Video</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- External JavaScript -->
-    <script src="index.js" type="module"></script>
-</body>
-</html>
+window.closeAdminModals = function() {
+    const plModal = document.getElementById('playlistModal');
+    const vidModal = document.getElementById('videoModal');
+    if (plModal) plModal.style.display = 'none';
+    if (vidModal) vidModal.style.display = 'none';
+};
